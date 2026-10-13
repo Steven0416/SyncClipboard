@@ -442,6 +442,8 @@ namespace SyncClipboard.Core
             services.AddServerAdapter<S3Config, S3Adapter>();
             services.AddLogInHelper<WebDavConfig, NextCloudLoginHelper>();
             services.AddSingleton<LocalClipboardSetter>();
+            services.AddSingleton<LanClipboardBridge>();
+            services.AddSingleton<LanFirstService>();
             services.AddSingleton<IClipboardWriteCapabilities, DefaultClipboardWriteCapabilities>();
             services.AddSingleton<ProfileActionBuilder>();
             services.AddSingleton<IProfileEnv, ClientProfileEnvProvider>();
@@ -476,6 +478,7 @@ namespace SyncClipboard.Core
             services.AddSingleton<IService, EasyCopyImageSerivce>();
             services.AddSingleton<IService, ConvertService>();
             services.AddSingleton<IService, ServerService>();
+            services.AddSingleton<IService>(sp => sp.GetRequiredService<LanFirstService>());
             services.AddSingleton<UploadService>();
             services.AddSingleton<IService, UploadService>(sp => sp.GetRequiredService<UploadService>());
             services.AddSingleton<DownloadService>();

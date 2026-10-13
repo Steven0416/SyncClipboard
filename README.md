@@ -1,4 +1,9 @@
 # SyncClipboard
+
+> LAN-first Fork（实验性开发分支）：Fork 自 [Jeric-X/SyncClipboard](https://github.com/Jeric-X/SyncClipboard)，原作者 JericX，保留 MIT 许可证和贡献历史。新增 Windows LAN 文本直连、原生 mDNS 注册与 NAS 按需文本请求。完整目标尚未完成，请保留现有正式环境。
+>
+> [架构与限制](docs/ai_design/lan-first.md) · [编译与配对教程](docs/ai_design/lan-first-setup.md) · [实际测试记录](docs/ai_design/lan-first-validation.md) · [English](docs/ai_design/lan-first.en.md)
+
 [![build](https://github.com/Jeric-X/SyncClipboard/actions/workflows/build-entry.yml/badge.svg?branch=master)](https://github.com/Jeric-X/SyncClipboard/actions?query=branch%3Amaster)
 
 中文 | [English](docs/README_EN.md)  

@@ -3,6 +3,11 @@ using CommunityToolkit.Mvvm.Input;
 using SyncClipboard.Core.Commons;
 using SyncClipboard.Core.Models.UserConfigs;
 using SyncClipboard.Core.Utilities;
+using SyncClipboard.Core.RemoteServer;
+using SyncClipboard.Core.UserServices.ServerService;
+using System.Net.Http.Headers;
+using System.Security.Cryptography;
+using SyncClipboard.Core.Clipboard;
 
 namespace SyncClipboard.Core.ViewModels;
 
@@ -92,10 +97,151 @@ public partial class ServerConfigViewModel : ObservableObject
     #endregion
 
     private readonly ConfigManager _configManager;
+    private readonly LanFirstService? _lanService;
+    private readonly RemoteClipboardServerFactory? _remoteFactory;
+    private readonly LanClipboardBridge? _lanClipboard;
+    private int _nasModeChange;
 
-    public ServerConfigViewModel(ConfigManager configManager)
+    public bool LanEnabled
+    {
+        get => _configManager.GetConfig<LanFirstConfig>().Enabled;
+        set
+        {
+            _configManager.SetConfig(_configManager.GetConfig<LanFirstConfig>() with { Enabled = value });
+            OnPropertyChanged();
+        }
+    }
+
+    public bool LanAllowPublic
+    {
+        get => _configManager.GetConfig<LanFirstConfig>().AllowPublicNetworks;
+        set
+        {
+            _configManager.SetConfig(_configManager.GetConfig<LanFirstConfig>() with { AllowPublicNetworks = value });
+            OnPropertyChanged();
+        }
+    }
+
+    public bool LanOnDemandNas
+    {
+        get => _configManager.GetConfig<LanFirstConfig>().OnDemandNas;
+        set
+        {
+            var revision = Interlocked.Increment(ref _nasModeChange);
+            if (value)
+            {
+                _ = EnableOnDemandNasAsync(revision);
+            }
+            else
+            {
+                _configManager.SetConfig(_configManager.GetConfig<LanFirstConfig>() with { OnDemandNas = false });
+                _remoteFactory?.ResetCurrentServer();
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private async Task EnableOnDemandNasAsync(int revision)
+    {
+        try
+        {
+            using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            if (_remoteFactory?.Current is not OfficialEventDrivenServer server
+                || !await server.SupportsLanFirstAsync(timeout.Token))
+            {
+                LanStatus = "NAS must support v1 text relay over HTTPS. Upgrade and verify before enabling.";
+                return;
+            }
+            if (revision != Volatile.Read(ref _nasModeChange))
+            {
+                return;
+            }
+            _configManager.SetConfig(_configManager.GetConfig<LanFirstConfig>() with { OnDemandNas = true });
+            _remoteFactory.ResetCurrentServer();
+            RefreshLanStatus();
+        }
+        catch (Exception ex)
+        {
+            LanStatus = $"NAS capability check failed: {ex.GetType().Name}; original sync retained.";
+        }
+        finally
+        {
+            OnPropertyChanged(nameof(LanOnDemandNas));
+        }
+    }
+
+    public double LanPort
+    {
+        get => _configManager.GetConfig<LanFirstConfig>().Port;
+        set
+        {
+            if (value is >= 1 and <= 65535)
+            {
+                _configManager.SetConfig(_configManager.GetConfig<LanFirstConfig>() with { Port = (ushort)value });
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public string LanHostName => _configManager.GetConfig<LanFirstConfig>().HostName;
+    public string LanDeviceId => _configManager.GetConfig<LanFirstConfig>().DeviceId;
+    public string LanPairingToken => _configManager.GetConfig<LanFirstConfig>().Token;
+
+    [ObservableProperty]
+    private string lanStatus = "Refresh status / 刷新状态";
+
+    [RelayCommand]
+    private void RefreshLanStatus()
+    {
+        var nas = _remoteFactory?.Current as OfficialEventDrivenServer;
+        LanStatus = $"{_lanService?.Status ?? "Unavailable"}\n{_lanService?.Addresses}\n"
+            + (nas?.OnDemandStatus ?? "NAS: no official server selected")
+            + $"\nLast successful transport / 最近成功通道: {_lanClipboard?.LastTransport}";
+    }
+
+    [RelayCommand]
+    private void RegenerateLanToken()
+    {
+        _configManager.SetConfig(_configManager.GetConfig<LanFirstConfig>() with
+        {
+            Token = Convert.ToHexString(RandomNumberGenerator.GetBytes(32))
+        });
+        OnPropertyChanged(nameof(LanPairingToken));
+        LanStatus = "Token regenerated. Update the paired shortcuts. / 请更新已配对快捷指令。";
+    }
+
+    [RelayCommand]
+    private static void OpenLanLogs() => Sys.OpenWithDefaultApp(Env.LogFolder);
+
+    [RelayCommand]
+    private async Task TestLanConnection()
+    {
+        var config = _configManager.GetConfig<LanFirstConfig>();
+        try
+        {
+            using var client = new HttpClient(new HttpClientHandler { UseProxy = false })
+            {
+                Timeout = TimeSpan.FromSeconds(4)
+            };
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", config.Token);
+            using var response = await client.GetAsync($"http://{config.HostName}:{config.Port}/api/lan-first/v1/capabilities");
+            response.EnsureSuccessStatusCode();
+            LanStatus = "Windows hostname + HTTP test passed; iPhone access still requires a device test.";
+        }
+        catch (Exception ex)
+        {
+            LanStatus = $"LAN test failed: {ex.GetType().Name}. Check network category, mDNS and firewall.";
+        }
+    }
+
+    public ServerConfigViewModel(ConfigManager configManager, LanFirstService? lanService = null,
+        RemoteClipboardServerFactory? remoteFactory = null, LanClipboardBridge? lanClipboard = null)
     {
         _configManager = configManager;
+        _lanService = lanService;
+        _remoteFactory = remoteFactory;
+        _lanClipboard = lanClipboard;
+        _configManager.SetConfig(_configManager.GetConfig<LanFirstConfig>());
         _configManager.ListenConfig<ServerConfig>(config => ServerConfig = config);
         serverConfig = _configManager.GetConfig<ServerConfig>();
         serverEnable = serverConfig.SwitchOn;
