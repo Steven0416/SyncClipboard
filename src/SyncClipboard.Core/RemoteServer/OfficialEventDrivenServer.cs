@@ -6,6 +6,7 @@ using SyncClipboard.Core.RemoteServer.Adapter;
 using SyncClipboard.Core.Utilities.Runner;
 using SyncClipboard.Server.Core.Models;
 using SyncClipboard.Core.Utilities.History;
+using SyncClipboard.Core.RemoteServer.Adapter.OfficialServer;
 
 namespace SyncClipboard.Core.RemoteServer;
 
@@ -19,6 +20,10 @@ public sealed class OfficialEventDrivenServer : IRemoteClipboardServer, IOfficia
     private readonly HistoryTransferQueue _historyTransferQueue;
     private readonly SingletonTask _singletonQueryTask = new SingletonTask();
     private bool _disconnected = true;
+    public bool OnDemandEnabled => _serverAdapter is OfficialAdapter { OnDemandEnabled: true };
+    public string OnDemandStatus => (_serverAdapter as OfficialAdapter)?.OnDemandStatus ?? "Unavailable";
+    public Task<bool> SupportsLanFirstAsync(CancellationToken token) => _serverAdapter is OfficialAdapter adapter
+        ? adapter.SupportsLanFirstAsync(token) : Task.FromResult(false);
 
     public event Action<HistoryRecordDto>? HistoryChanged;
 
@@ -55,6 +60,10 @@ public sealed class OfficialEventDrivenServer : IRemoteClipboardServer, IOfficia
 
     private async Task QueryOnce(CancellationToken cancellationToken)
     {
+        if (OnDemandEnabled)
+        {
+            return; // The legacy snapshot may predate unsent local copies. It is never a remote command.
+        }
         try
         {
             var profile = await GetProfileAsync(cancellationToken).ConfigureAwait(false);
@@ -118,6 +127,10 @@ public sealed class OfficialEventDrivenServer : IRemoteClipboardServer, IOfficia
 
     private void OnProfileDtoChanged(ProfileDto newProfileDto)
     {
+        if (OnDemandEnabled && newProfileDto.Type == ProfileType.Text)
+        {
+            return;
+        }
         var newProfile = Profile.Create(newProfileDto);
         RemoteProfileChangedImpl?.Invoke(this, new ProfileChangedEventArgs
         {

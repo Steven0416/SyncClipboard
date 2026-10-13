@@ -1,4 +1,4 @@
-<Page x:Class="SyncClipboard.WinUI3.Views.ServerConfigPage"
+﻿<Page x:Class="SyncClipboard.WinUI3.Views.ServerConfigPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -22,6 +22,33 @@
         </Style>
     </Page.Resources>
     <StackPanel Spacing="10">
+        <ui:SettingsExpander Header="LAN-first（实验性文本通道）" IsExpanded="True" Description="局域网直接读写 Windows；图片、文件仍使用原同步通道。">
+            <ToggleSwitch IsOn="{x:Bind _viewModel.LanEnabled, Mode=TwoWay}" />
+            <ui:SettingsExpander.Items>
+                <ui:SettingsCard Header="稳定 .local 主机名" Description="{x:Bind _viewModel.LanHostName, Mode=OneWay}" />
+                <ui:SettingsCard Header="设备 ID" Description="{x:Bind _viewModel.LanDeviceId, Mode=OneWay}" />
+                <ui:SettingsCard Header="LAN 端口">
+                    <NumberBox Minimum="1" Maximum="65535" Value="{x:Bind _viewModel.LanPort, Mode=TwoWay}" />
+                </ui:SettingsCard>
+                <ui:SettingsCard Header="允许公共／域网络" Description="风险：HTTP 会明文传输剪贴板和 Token。仅在可信且允许设备互访的网络主动开启。">
+                    <ToggleSwitch IsOn="{x:Bind _viewModel.LanAllowPublic, Mode=TwoWay}" />
+                </ui:SettingsCard>
+                <ui:SettingsCard Header="NAS 文本按需同步" Description="先升级 NAS 并配置新快捷指令。启用后停止自动上传文本、忽略旧 NAS 快照；离线发送不排队。">
+                    <ToggleSwitch IsOn="{x:Bind _viewModel.LanOnDemandNas, Mode=TwoWay}" />
+                </ui:SettingsCard>
+                <ui:SettingsCard Header="配对 Token（勿分享）">
+                    <PasswordBox Password="{x:Bind _viewModel.LanPairingToken, Mode=OneWay}" PasswordRevealMode="Peek" />
+                </ui:SettingsCard>
+                <ui:SettingsCard Header="连接与发现状态" Description="{x:Bind _viewModel.LanStatus, Mode=OneWay}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button Width="Auto" Content="刷新" Command="{x:Bind _viewModel.RefreshLanStatusCommand}" />
+                        <Button Width="Auto" Content="测试" Command="{x:Bind _viewModel.TestLanConnectionCommand}" />
+                        <Button Width="Auto" Content="重置 Token" Command="{x:Bind _viewModel.RegenerateLanTokenCommand}" />
+                        <Button Width="Auto" Content="日志" Command="{x:Bind _viewModel.OpenLanLogsCommand}" />
+                    </StackPanel>
+                </ui:SettingsCard>
+            </ui:SettingsExpander.Items>
+        </ui:SettingsExpander>
         <ui:SettingsExpander Header="{x:Bind i18n:Strings.Server}" Description="{x:Bind i18n:Strings.ServerDescription}" IsExpanded="True">
             <ui:SettingsExpander.HeaderIcon>
                 <FontIcon Glyph="&#xE753;" />

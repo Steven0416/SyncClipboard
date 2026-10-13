@@ -1,5 +1,10 @@
 # SyncClipboard
 
+> Experimental LAN-first fork of [Jeric-X/SyncClipboard](https://github.com/Jeric-X/SyncClipboard), authored by JericX, under MIT. The complete architecture is not yet delivered. Preserve your working installation and NAS deployment.
+>
+> [Capabilities and limitations](ai_design/lan-first.en.md) · [Actual validation results](ai_design/lan-first-validation.md)
+
+
 [中文](../README.md) | English
 
 <details>

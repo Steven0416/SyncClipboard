@@ -1,6 +1,9 @@
 ﻿using NativeNotification.Interface;
 using SyncClipboard.Core.Commons;
 using SyncClipboard.Core.Interfaces;
+using SyncClipboard.Core.Clipboard;
+using SyncClipboard.Core.RemoteServer;
+using SyncClipboard.Core.UserServices.ServerService;
 using System.Reflection;
 
 namespace SyncClipboard.Test;
@@ -16,7 +19,9 @@ public class SystemServiceProviderDataSource : ServiceProviderDataSourceBase
             typeof(IAppConfig),
             typeof(IUpdateInstallerFactory),
             typeof(ILogger),
-            typeof(IWebDav),
+            typeof(RemoteClipboardServerFactory),
+            typeof(LanClipboardBridge),
+            typeof(LanFirstService),
             typeof(IHttp),
             typeof(INotificationManager)
         ];

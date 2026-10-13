@@ -242,6 +242,12 @@ public class UploadService : ClipboardHander
 
     protected override async Task HandleClipboard(ClipboardMetaInfomation meta, Profile profile, CancellationToken token)
     {
+        if (_remoteClipboardServerFactory.Current is OfficialEventDrivenServer { OnDemandEnabled: true }
+            && profile is TextProfile)
+        {
+            _trayIcon.SetStatusString(SERVICE_NAME_SIMPLE, "NAS on-demand: text retained on Windows.", false);
+            return;
+        }
         var filterConfig = _configManager.GetConfig<ClipboardOwnerFilterConfig>();
         if (ClipboardOwnerFilterHelper.ShouldFilter(filterConfig, meta.Owner))
         {

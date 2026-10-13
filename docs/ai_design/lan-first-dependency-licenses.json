@@ -1,0 +1,800 @@
+[
+  {
+    "package": "AWSSDK.Core/3.7.401.10",
+    "licenseType": "expression",
+    "license": "Apache-2.0",
+    "licenseUrl": "https://licenses.nuget.org/Apache-2.0",
+    "projectUrl": "https://github.com/aws/aws-sdk-net/"
+  },
+  {
+    "package": "AWSSDK.S3/3.7.414",
+    "licenseType": "expression",
+    "license": "Apache-2.0",
+    "licenseUrl": "https://licenses.nuget.org/Apache-2.0",
+    "projectUrl": "https://github.com/aws/aws-sdk-net/"
+  },
+  {
+    "package": "codecracker.CSharp/1.1.0",
+    "licenseType": null,
+    "license": null,
+    "licenseUrl": "https://github.com/code-cracker/code-cracker/blob/master/LICENSE.txt",
+    "projectUrl": "http://code-cracker.github.io/"
+  },
+  {
+    "package": "CommunityToolkit.Common/8.2.1",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://github.com/CommunityToolkit/dotnet"
+  },
+  {
+    "package": "CommunityToolkit.Mvvm/8.4.2",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://github.com/CommunityToolkit/dotnet"
+  },
+  {
+    "package": "CommunityToolkit.WinUI.Controls.SettingsControls/8.2.251219",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://github.com/CommunityToolkit/Windows"
+  },
+  {
+    "package": "CommunityToolkit.WinUI.Converters/8.2.251219",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://github.com/CommunityToolkit/Windows"
+  },
+  {
+    "package": "CommunityToolkit.WinUI.Extensions/8.2.251219",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://github.com/CommunityToolkit/Windows"
+  },
+  {
+    "package": "CommunityToolkit.WinUI.Helpers/8.2.251219",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://github.com/CommunityToolkit/Windows"
+  },
+  {
+    "package": "CommunityToolkit.WinUI.Triggers/8.2.251219",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://github.com/CommunityToolkit/Windows"
+  },
+  {
+    "package": "H.GeneratedIcons.System.Drawing/2.4.1",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://github.com/HavenDV/H.NotifyIcon"
+  },
+  {
+    "package": "H.NotifyIcon.WinUI/2.4.1",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://github.com/HavenDV/H.NotifyIcon"
+  },
+  {
+    "package": "H.NotifyIcon/2.4.1",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://github.com/HavenDV/H.NotifyIcon"
+  },
+  {
+    "package": "Humanizer.Core/2.14.1",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://github.com/Humanizr/Humanizer"
+  },
+  {
+    "package": "Interop.UIAutomationClient/10.19041.0",
+    "licenseType": "file",
+    "license": "LICENSE.txt",
+    "licenseUrl": "https://aka.ms/deprecateLicenseUrl",
+    "projectUrl": "https://github.com/Roemer/UIAutomation-Interop"
+  },
+  {
+    "package": "Magick.NET-Q16-x64/14.9.1",
+    "licenseType": "expression",
+    "license": "Apache-2.0",
+    "licenseUrl": "https://licenses.nuget.org/Apache-2.0",
+    "projectUrl": "https://github.com/dlemstra/Magick.NET"
+  },
+  {
+    "package": "Magick.NET.Core/14.10.2",
+    "licenseType": "expression",
+    "license": "Apache-2.0",
+    "licenseUrl": "https://licenses.nuget.org/Apache-2.0",
+    "projectUrl": "https://github.com/dlemstra/Magick.NET"
+  },
+  {
+    "package": "Magick.NET.Core/14.9.1",
+    "licenseType": "expression",
+    "license": "Apache-2.0",
+    "licenseUrl": "https://licenses.nuget.org/Apache-2.0",
+    "projectUrl": "https://github.com/dlemstra/Magick.NET"
+  },
+  {
+    "package": "Magick.NET.SystemDrawing/8.0.15",
+    "licenseType": "expression",
+    "license": "Apache-2.0",
+    "licenseUrl": "https://licenses.nuget.org/Apache-2.0",
+    "projectUrl": "https://github.com/dlemstra/Magick.NET"
+  },
+  {
+    "package": "Microsoft.AspNetCore.Connections.Abstractions/10.0.12",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://asp.net/"
+  },
+  {
+    "package": "Microsoft.AspNetCore.Http.Connections.Client/10.0.12",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://asp.net/"
+  },
+  {
+    "package": "Microsoft.AspNetCore.Http.Connections.Common/10.0.12",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://asp.net/"
+  },
+  {
+    "package": "Microsoft.AspNetCore.SignalR.Client.Core/10.0.12",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://asp.net/"
+  },
+  {
+    "package": "Microsoft.AspNetCore.SignalR.Client/10.0.12",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://asp.net/"
+  },
+  {
+    "package": "Microsoft.AspNetCore.SignalR.Common/10.0.12",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://asp.net/"
+  },
+  {
+    "package": "Microsoft.AspNetCore.SignalR.Protocols.Json/10.0.12",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://asp.net/"
+  },
+  {
+    "package": "Microsoft.Bcl.AsyncInterfaces/7.0.0",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://dot.net/"
+  },
+  {
+    "package": "Microsoft.Build.Framework/17.8.43",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "http://go.microsoft.com/fwlink/?LinkId=624683"
+  },
+  {
+    "package": "Microsoft.Build.Locator/1.7.8",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://github.com/microsoft/MSBuildLocator"
+  },
+  {
+    "package": "Microsoft.CodeAnalysis.Analyzers/3.3.4",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://github.com/dotnet/roslyn-analyzers"
+  },
+  {
+    "package": "Microsoft.CodeAnalysis.Common/4.8.0",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://github.com/dotnet/roslyn"
+  },
+  {
+    "package": "Microsoft.CodeAnalysis.CSharp.Workspaces/4.8.0",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://github.com/dotnet/roslyn"
+  },
+  {
+    "package": "Microsoft.CodeAnalysis.CSharp/4.8.0",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://github.com/dotnet/roslyn"
+  },
+  {
+    "package": "Microsoft.CodeAnalysis.Workspaces.Common/4.8.0",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://github.com/dotnet/roslyn"
+  },
+  {
+    "package": "Microsoft.CodeAnalysis.Workspaces.MSBuild/4.8.0",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://github.com/dotnet/roslyn"
+  },
+  {
+    "package": "Microsoft.Data.Sqlite.Core/9.0.20",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://docs.microsoft.com/dotnet/standard/data/sqlite/"
+  },
+  {
+    "package": "Microsoft.EntityFrameworkCore.Abstractions/9.0.20",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://docs.microsoft.com/ef/core/"
+  },
+  {
+    "package": "Microsoft.EntityFrameworkCore.Analyzers/9.0.20",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://docs.microsoft.com/ef/core/"
+  },
+  {
+    "package": "Microsoft.EntityFrameworkCore.Design/9.0.20",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://docs.microsoft.com/ef/core/"
+  },
+  {
+    "package": "Microsoft.EntityFrameworkCore.Relational/9.0.20",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://docs.microsoft.com/ef/core/"
+  },
+  {
+    "package": "Microsoft.EntityFrameworkCore.Sqlite.Core/9.0.20",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://docs.microsoft.com/ef/core/"
+  },
+  {
+    "package": "Microsoft.EntityFrameworkCore.Sqlite/9.0.20",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://docs.microsoft.com/ef/core/"
+  },
+  {
+    "package": "Microsoft.EntityFrameworkCore/9.0.20",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://docs.microsoft.com/ef/core/"
+  },
+  {
+    "package": "Microsoft.Extensions.ApiDescription.Server/6.0.5",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://asp.net/"
+  },
+  {
+    "package": "Microsoft.Extensions.Caching.Abstractions/9.0.20",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://dot.net/"
+  },
+  {
+    "package": "Microsoft.Extensions.Caching.Memory/9.0.20",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://dot.net/"
+  },
+  {
+    "package": "Microsoft.Extensions.Configuration.Abstractions/10.0.12",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://dot.net/"
+  },
+  {
+    "package": "Microsoft.Extensions.Configuration.Binder/10.0.12",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://dot.net/"
+  },
+  {
+    "package": "Microsoft.Extensions.Configuration/10.0.12",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://dot.net/"
+  },
+  {
+    "package": "Microsoft.Extensions.DependencyInjection.Abstractions/10.0.12",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://dot.net/"
+  },
+  {
+    "package": "Microsoft.Extensions.DependencyInjection/10.0.12",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://dot.net/"
+  },
+  {
+    "package": "Microsoft.Extensions.DependencyModel/9.0.20",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://dot.net/"
+  },
+  {
+    "package": "Microsoft.Extensions.Features/10.0.12",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://asp.net/"
+  },
+  {
+    "package": "Microsoft.Extensions.Logging.Abstractions/10.0.12",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://dot.net/"
+  },
+  {
+    "package": "Microsoft.Extensions.Logging.Configuration/10.0.12",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://dot.net/"
+  },
+  {
+    "package": "Microsoft.Extensions.Logging.Console/10.0.12",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://dot.net/"
+  },
+  {
+    "package": "Microsoft.Extensions.Logging/10.0.12",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://dot.net/"
+  },
+  {
+    "package": "Microsoft.Extensions.Options.ConfigurationExtensions/10.0.12",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://dot.net/"
+  },
+  {
+    "package": "Microsoft.Extensions.Options/10.0.12",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://dot.net/"
+  },
+  {
+    "package": "Microsoft.Extensions.Primitives/10.0.12",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://dot.net/"
+  },
+  {
+    "package": "Microsoft.NET.ILLink.Tasks/10.0.10",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://dot.net/"
+  },
+  {
+    "package": "Microsoft.OpenApi/1.6.23",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://github.com/Microsoft/OpenAPI.NET"
+  },
+  {
+    "package": "Microsoft.Toolkit.Uwp.Notifications/7.1.3",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://github.com/CommunityToolkit/WindowsCommunityToolkit"
+  },
+  {
+    "package": "Microsoft.VisualStudio.Azure.Containers.Tools.Targets/1.23.0",
+    "licenseType": "file",
+    "license": "EULA.md",
+    "licenseUrl": "https://aka.ms/deprecateLicenseUrl",
+    "projectUrl": "https://aka.ms/vscontainertools"
+  },
+  {
+    "package": "Microsoft.Web.WebView2/1.0.3719.77",
+    "licenseType": "file",
+    "license": "LICENSE.txt",
+    "licenseUrl": "https://aka.ms/deprecateLicenseUrl",
+    "projectUrl": "https://aka.ms/webview"
+  },
+  {
+    "package": "Microsoft.Win32.SystemEvents/10.0.0",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://dot.net/"
+  },
+  {
+    "package": "Microsoft.Windows.AI.MachineLearning/2.1.74",
+    "licenseType": "file",
+    "license": "license.txt",
+    "licenseUrl": "https://aka.ms/deprecateLicenseUrl",
+    "projectUrl": "https://github.com/microsoft/windowsappsdk"
+  },
+  {
+    "package": "Microsoft.Windows.SDK.BuildTools.MSIX/1.7.251221100",
+    "licenseType": "file",
+    "license": "sdk_license.txt",
+    "licenseUrl": "https://aka.ms/deprecateLicenseUrl",
+    "projectUrl": "https://aka.ms/WinSDKProjectURL"
+  },
+  {
+    "package": "Microsoft.Windows.SDK.BuildTools/10.0.26100.4948",
+    "licenseType": null,
+    "license": null,
+    "licenseUrl": "https://aka.ms/WinSDKLicenseURL",
+    "projectUrl": "https://aka.ms/WinSDKProjectURL"
+  },
+  {
+    "package": "Microsoft.WindowsAppSDK.AI/2.4.4",
+    "licenseType": "file",
+    "license": "license.txt",
+    "licenseUrl": "https://aka.ms/deprecateLicenseUrl",
+    "projectUrl": "https://github.com/microsoft/windowsappsdk"
+  },
+  {
+    "package": "Microsoft.WindowsAppSDK.Base/2.0.4",
+    "licenseType": "file",
+    "license": "license.txt",
+    "licenseUrl": "https://aka.ms/deprecateLicenseUrl",
+    "projectUrl": "https://github.com/microsoft/windowsappsdk"
+  },
+  {
+    "package": "Microsoft.WindowsAppSDK.DWrite/2.1.0",
+    "licenseType": "file",
+    "license": "license.txt",
+    "licenseUrl": "https://aka.ms/deprecateLicenseUrl",
+    "projectUrl": "https://aka.ms/WindowsAppSDK"
+  },
+  {
+    "package": "Microsoft.WindowsAppSDK.Foundation/2.3.9",
+    "licenseType": "file",
+    "license": "license.txt",
+    "licenseUrl": "https://aka.ms/deprecateLicenseUrl",
+    "projectUrl": "https://aka.ms/windowsappsdk"
+  },
+  {
+    "package": "Microsoft.WindowsAppSDK.InteractiveExperiences/2.1.6",
+    "licenseType": "file",
+    "license": "license.txt",
+    "licenseUrl": "https://aka.ms/deprecateLicenseUrl",
+    "projectUrl": "https://aka.ms/windowsappsdk"
+  },
+  {
+    "package": "Microsoft.WindowsAppSDK.ML/2.1.74",
+    "licenseType": "file",
+    "license": "license.txt",
+    "licenseUrl": "https://aka.ms/deprecateLicenseUrl",
+    "projectUrl": "https://github.com/microsoft/windowsappsdk"
+  },
+  {
+    "package": "Microsoft.WindowsAppSDK.Runtime/2.4.0",
+    "licenseType": "file",
+    "license": "license.txt",
+    "licenseUrl": "https://aka.ms/deprecateLicenseUrl",
+    "projectUrl": "https://github.com/microsoft/windowsappsdk"
+  },
+  {
+    "package": "Microsoft.WindowsAppSDK.Search/2.4.4",
+    "licenseType": "file",
+    "license": "license.txt",
+    "licenseUrl": "https://aka.ms/deprecateLicenseUrl",
+    "projectUrl": "https://github.com/microsoft/windowsappsdk"
+  },
+  {
+    "package": "Microsoft.WindowsAppSDK.Widgets/2.0.5",
+    "licenseType": "file",
+    "license": "license.txt",
+    "licenseUrl": "https://aka.ms/deprecateLicenseUrl",
+    "projectUrl": "https://github.com/microsoft/windowsappsdk"
+  },
+  {
+    "package": "Microsoft.WindowsAppSDK.WinUI/2.3.6",
+    "licenseType": "file",
+    "license": "license.txt",
+    "licenseUrl": "https://aka.ms/deprecateLicenseUrl",
+    "projectUrl": "https://github.com/microsoft/windowsappsdk"
+  },
+  {
+    "package": "Microsoft.WindowsAppSDK/2.4.0",
+    "licenseType": "file",
+    "license": "license.txt",
+    "licenseUrl": "https://aka.ms/deprecateLicenseUrl",
+    "projectUrl": "https://github.com/microsoft/windowsappsdk"
+  },
+  {
+    "package": "Mono.TextTemplating/3.0.0",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://github.com/mono/t4"
+  },
+  {
+    "package": "NativeNotification.Interface/1.0.5",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://github.com/Jeric-X/NativeNotification"
+  },
+  {
+    "package": "NativeNotification/1.0.5",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://github.com/Jeric-X/NativeNotification"
+  },
+  {
+    "package": "ObservableCollections/3.3.4",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://github.com/Cysharp/ObservableCollections"
+  },
+  {
+    "package": "Quartz.Extensions.DependencyInjection/3.14.0",
+    "licenseType": "expression",
+    "license": "Apache-2.0",
+    "licenseUrl": "https://licenses.nuget.org/Apache-2.0",
+    "projectUrl": "https://www.quartz-scheduler.net/"
+  },
+  {
+    "package": "Quartz/3.14.0",
+    "licenseType": "expression",
+    "license": "Apache-2.0",
+    "licenseUrl": "https://licenses.nuget.org/Apache-2.0",
+    "projectUrl": "https://www.quartz-scheduler.net/"
+  },
+  {
+    "package": "SharpHook/8.0.0",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://sharphook.tolik.io/"
+  },
+  {
+    "package": "SQLitePCLRaw.bundle_e_sqlite3/2.1.12",
+    "licenseType": "expression",
+    "license": "Apache-2.0",
+    "licenseUrl": "https://licenses.nuget.org/Apache-2.0",
+    "projectUrl": ""
+  },
+  {
+    "package": "SQLitePCLRaw.core/2.1.12",
+    "licenseType": "expression",
+    "license": "Apache-2.0",
+    "licenseUrl": "https://licenses.nuget.org/Apache-2.0",
+    "projectUrl": ""
+  },
+  {
+    "package": "SQLitePCLRaw.lib.e_sqlite3/2.1.12",
+    "licenseType": "expression",
+    "license": "Apache-2.0",
+    "licenseUrl": "https://licenses.nuget.org/Apache-2.0",
+    "projectUrl": ""
+  },
+  {
+    "package": "SQLitePCLRaw.provider.e_sqlite3/2.1.12",
+    "licenseType": "expression",
+    "license": "Apache-2.0",
+    "licenseUrl": "https://licenses.nuget.org/Apache-2.0",
+    "projectUrl": ""
+  },
+  {
+    "package": "Swashbuckle.AspNetCore.Swagger/8.1.1",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://github.com/domaindrivendev/Swashbuckle.AspNetCore"
+  },
+  {
+    "package": "Swashbuckle.AspNetCore.SwaggerGen/8.1.1",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://github.com/domaindrivendev/Swashbuckle.AspNetCore"
+  },
+  {
+    "package": "Swashbuckle.AspNetCore.SwaggerUI/8.1.1",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://github.com/domaindrivendev/Swashbuckle.AspNetCore"
+  },
+  {
+    "package": "Swashbuckle.AspNetCore/8.1.1",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://github.com/domaindrivendev/Swashbuckle.AspNetCore"
+  },
+  {
+    "package": "System.CodeDom/6.0.0",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://dot.net/"
+  },
+  {
+    "package": "System.Composition.AttributedModel/7.0.0",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://dot.net/"
+  },
+  {
+    "package": "System.Composition.Convention/7.0.0",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://dot.net/"
+  },
+  {
+    "package": "System.Composition.Hosting/7.0.0",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://dot.net/"
+  },
+  {
+    "package": "System.Composition.Runtime/7.0.0",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://dot.net/"
+  },
+  {
+    "package": "System.Composition.TypedParts/7.0.0",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://dot.net/"
+  },
+  {
+    "package": "System.Composition/7.0.0",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://dot.net/"
+  },
+  {
+    "package": "System.Drawing.Common/10.0.0",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://github.com/dotnet/winforms"
+  },
+  {
+    "package": "System.Numerics.Tensors/9.0.0",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://dot.net/"
+  },
+  {
+    "package": "Tmds.DBus/0.92.0",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": ""
+  },
+  {
+    "package": "Vanara.Core/4.0.1",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://github.com/dahall/vanara"
+  },
+  {
+    "package": "Vanara.PInvoke.ComCtl32/4.0.1",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://github.com/dahall/vanara"
+  },
+  {
+    "package": "Vanara.PInvoke.DbgHelp/4.0.1",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://github.com/dahall/vanara"
+  },
+  {
+    "package": "Vanara.PInvoke.Gdi32/4.0.1",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://github.com/dahall/vanara"
+  },
+  {
+    "package": "Vanara.PInvoke.Kernel32/4.0.1",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://github.com/dahall/vanara"
+  },
+  {
+    "package": "Vanara.PInvoke.Shared/4.0.1",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://github.com/dahall/vanara"
+  },
+  {
+    "package": "Vanara.PInvoke.User32/4.0.1",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://github.com/dahall/vanara"
+  },
+  {
+    "package": "Vanara.PInvoke.Version/4.0.1",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://github.com/dahall/vanara"
+  },
+  {
+    "package": "WinUIEx/2.9.3",
+    "licenseType": "expression",
+    "license": "MIT",
+    "licenseUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "https://dotmorten.github.io/WinUIEx"
+  }
+]

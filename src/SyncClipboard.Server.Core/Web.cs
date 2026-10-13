@@ -35,7 +35,8 @@ public class Web
             })
             .AddApplicationPart(typeof(SyncClipboardController).Assembly);
         services.AddMemoryCache();
-        services.AddSignalR();
+        services.AddSignalR(options => options.MaximumReceiveMessageSize = 2 * 1024 * 1024);
+        services.AddSingleton<LanRelay>();
 
         services.AddDbContext<HistoryDbContext>();
         services.AddScoped<HistoryService>();
