@@ -10,6 +10,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: lan-first-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
 jobs:
   core-and-server:
     runs-on: windows-2025-vs2026
@@ -41,3 +45,5 @@ jobs:
           msbuild-architecture: x64
       - name: Build WinUI3 x64
         run: msbuild src\SyncClipboard.WinUI3\SyncClipboard.WinUI3.csproj /p:Platform=x64 /p:RuntimeIdentifier=win-x64 /p:Configuration=Release /p:WindowsAppSDKSelfContained=true /p:SelfContained=true /v:m -restore
+      - name: Validate Windows service graph
+        run: dotnet test src/SyncClipboard.Test.WinUI3 -c Release -r win-x64 -p:Platform=x64 --logger "trx;LogFileName=winui-services.trx"

@@ -12,7 +12,7 @@
 | 真实 NAS 协议集成（本机回环） | HTTP Basic 认证→SignalR 注册→请求→关联响应通过；断线返回 503 且没有旧 Profile。它使用模拟设备，不能替代 NAS 实机及 OS 剪贴板验收 |
 | WinUI3 x64 Release | 使用 SDK 自带 MSBuild (`dotnet build`) 成功，0 警告、0 错误；旧 VS 2022 MSBuild 17.11.2 加载 .NET 10 SDK 失败。需使用匹配工具链 |
 | NAS 服务端 Release publish | 通过；本地产物 artifacts/lan-first-server。未构建 Docker 镜像，未部署 DS220+ |
-| Windows WinUI3 服务注册测试 | 14 通过、1 失败：测试数据仍要求 IWebDav，但上游 AppCore 当前使用适配器工厂且未注册该接口。未更改此无关测试或添加无用服务以掩盖失败；完整上游基线测试尚未单独重跑。测试构建另有上游 PRI257/PRI263 资源语言警告 |
+| Windows WinUI3 服务注册测试 | 最终 17/17 通过。首次 14 通过、1 失败，定位为旧测试仍要求未注册的 IWebDav。更新该陈旧断言以验证实际 RemoteClipboardServerFactory，并新增 LanClipboardBridge、LanFirstService 注册验证；未添加无用产品服务。首次测试构建出现 PRI257/PRI263 资源语言警告，最终增量运行通过 |
 | C# 格式 | 对本次修改文件执行 dotnet format，限定文件检查通过 |
 | XAML 格式 | 对唯一修改的 XAML 执行 XamlStyler，校验通过 |
 | 凭据扫描 | 新增及修改文件未匹配 GitHub Token／私钥／URL 内嵌密码模式，人工审查无真实配对凭据；不提交 .tools、测试结果或用户配置。扫描不能证明绝对无泄露 |
@@ -51,7 +51,7 @@
 3. 实现 NAS 持久离线发送队列及恢复、明确的缓存状态和修改时间；当前返回 offline，不静默回放旧内容。
 4. 扩展完整 Profile/图片/文件 LAN 直连，评估历史同步独立策略。
 5. 在 iPhone 创建并运行快捷指令、验证 UUID 动作和局域网权限；可靠异常捕获未确认前保留手动菜单路径；获取用户认可的可导入分享版本。
-6. 真机完成上述 15 项验收，检查流量／NAS 写入，并单独确认上游服务注册测试问题。
+6. 真机完成上述 15 项验收，检查流量／NAS 写入。
 7. 完成发布产物许可核查、多语言界面和最终视觉验收，所有门槛通过后才创建 Release。
 
 当前提交应使用 Draft PR，不自动合并、不发布正式 Release。已成功构建不等同于完整产品验收通过。
