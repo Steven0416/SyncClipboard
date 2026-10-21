@@ -4,6 +4,8 @@
 >
 > [架构与限制](docs/ai_design/lan-first.md) · [编译与配对教程](docs/ai_design/lan-first-setup.md) · [实际测试记录](docs/ai_design/lan-first-validation.md) · [English](docs/ai_design/lan-first.en.md)
 
+> 固定名称 `clipbridge-test.local:5033` 的 Bonjour 主机发布已获 iPhone 实测成功；[后台运行与验证记录](docs/ai_design/bonjour-fixed-hostname.md)。真实 DHCP 换址和完整重启验收仍待完成。
+
 [![build](https://github.com/Jeric-X/SyncClipboard/actions/workflows/build-entry.yml/badge.svg?branch=master)](https://github.com/Jeric-X/SyncClipboard/actions?query=branch%3Amaster)
 
 中文 | [English](docs/README_EN.md)  

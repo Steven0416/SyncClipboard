@@ -27,6 +27,8 @@ jobs:
         run: dotnet test src/SyncClipboard.Test -c Release --filter "TestCategory!=PlatformWindows&TestCategory!=PlatformMacOS&TestCategory!=PlatformLinux" --logger "trx;LogFileName=lan-first.trx"
       - name: Build server
         run: dotnet build src/SyncClipboard.Server -c Release
+      - name: Build standalone Bonjour discovery
+        run: dotnet publish src/ClipBridge.Discovery -c Release -r win-x64 --self-contained true -o artifacts/clipbridge-discovery-win-x64
       - uses: actions/upload-artifact@v7
         if: always()
         with:
