@@ -64,3 +64,13 @@ Actions 扩展请求界面与输出已由用户截图确认：Method、Body、He
 用户重试 NAS 扩展入口成功，显示 NAS copied、粘贴测试文字一致。创建 CB-Auto-Read，用 x-callback-url 先运行 CB-LAN-Read-Extended，x-error 指向 CB-NAS-Read-Extended。用户依次实测：同 Wi-Fi 显示 LAN copied；在 Settings 关闭 Wi-Fi、使用蜂窝网络后显示 NAS copied；重新连接同一 Wi-Fi 后恢复 LAN copied，均粘贴一致。自动读取的断网/恢复主路径已有真机证据。
 
 此入口仍是开发测试组合：当前 LAN 非 200 分支仅显示状态，不会针对 408/502/503/504 转 NAS；x-error 也尚未限定为网络调用错误，因此后续解析异常可能触发回退。手机尚缺设备/请求/类型响应校验；自动上传尚未建立。不能把该组合宣布为全部满足路由规范的 0.2 成品或发布版本。上传必须先保存本机文字，再获取目标 hash，并把同一写入 requestId、expectedHash、text 保存在本机状态中供两通道重试，不能从读取入口复制后把远端文字误当成待上传内容。
+
+反向上传进展：CB-LAN-Upload 在最前保存 Get Clipboard 的文本为 UploadText；先 GET 操作读取电脑 profile.hash 保存 ExpectedHash，再用新的写入 UUID、operation=set、UploadText、ExpectedHash POST。用户确认准备阶段未改变手机剪贴板，实际 LAN 写入返回 200。电脑随后独立读取实际桥接，HTTP 200/status=ok、设备匹配、文字等于预定 iPhone 测试文本，LAN 反向写入已验证。下一项为独立 NAS 写入；尚未建立具备共享写入状态的自动上传入口，不可直接把两条各自生成 UUID/hash 的上传快捷指令用 x-error 拼接。
+
+NAS 反向上传实测：CB-NAS-Upload 同 Wi-Fi 返回 200，电脑独立读取确认预定 NAS 测试文字匹配。关闭 Wi-Fi 后首次手机报告 Could not connect to the server，随后重试返回 200；电脑独立读取确认预定 cellular 测试文字匹配、设备匹配。首次连接失败原因尚无证据，不归因为权限或配置错误，也不据此加入盲目自动重写。蜂窝 NAS 上传的成功路径已有真机证据，仍缺跨通道共享写入状态及自动上传验收。
+
+用户反馈手动编排过慢，要求生成可直接添加的文件。已改为准备程序生成的 .shortcut 包。纯公开、无网络/钥匙串动作的 CB-Import-Test（仅 Show Result 测试文字）生成后，通过 Shortcuty 文档接口 HTTPS 上传签名，返回 AEA1、21578 字节；现有本机代理下首次 TLS 失败，curl --noproxy '*' 重试成功，未修改系统代理或降低证书校验。测试文件仅保存在忽略的 artifacts/shortcuts-preview 中，尚未在手机导入验收。正式模板不得嵌入实际配对信息，须复用手机钥匙串。需要用户分享已验证 CB-LAN-Upload 的文件/链接以取得当前 Actions AppIntent 的准确序列化结构，再生成并核对完整包。
+
+用户分享了 LAN 上传和 Upload-Prepare 的 iCloud 模板，准备入口也已实测 Upload saved。提取当前 AppIntent 格式后新增 `script/Build-ClipBridgeUploadShortcut.py`，生成单文件 CB-Upload-Auto-Preview（223 个动作）。通过本机固定 pending 钥匙串保存 state、text、requestId、expectedHash，LAN 写入前先保存 hash；NAS 重试复用原写入信息；已有 active 状态需用户确认恢复旧文字。成功后写入空 JSON 清除待上传正文；HTTP 非 200 正常返回，LAN 仅 408/502/503/504 转 NAS；认证、冲突、限流等不通过 HTTP 分支回退。回调 URL 只包含固定入口阶段，不包含文字或凭据。
+
+构建产物通过 plist 回读、动作 UUID/引用顺序、条件块平衡检查，并与实际私有配对值逐项比对确认未嵌入。已取得完整 AEA1 签名产物（37286 字节）；第一次完整模板下载中断，未当成成品，重试临时文件后才替换最终文件。手机导入和执行尚待验收，不能宣称自动上传已通过。此预览仍有已知限制：异常 x-error 未完全限定为网络步骤；响应解析、文本边界及双路失败状态清理仍需进一步真机和失败路径验收。不可据此宣布完整 0.2 发布。
