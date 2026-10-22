@@ -156,6 +156,33 @@ def property_ref(value, name):
     return result
 
 
+def diagnostic_flag(name, value, uuid=False):
+    if uuid:
+        pattern = r"^(?:[0-9a-fA-F]{32}|[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12})$"
+        value = add("is.workflow.actions.text.match", WFMatchTextPattern=pattern, text=text(as_text(value)))
+    group = begin(value, 100)
+    result = set_variable(name, plain("yes"))
+    otherwise(group)
+    set_variable(name, plain("no"))
+    end(group)
+    return result
+
+
+def failure_report(response, code, body):
+    # Report only status and validity flags. Never display request text or headers.
+    error = add("is.workflow.actions.detect.dictionary", WFInput=attach(property_ref(response, "bodyText")))
+    server_status = field(error, "status")
+    server_title = field(error, "title")
+    valid_request = diagnostic_flag("DiagnosticRequestIdValid", body["requestId"], uuid=True)
+    valid_source = diagnostic_flag("DiagnosticSourceIdValid", body["sourceDeviceId"], uuid=True)
+    details = {"operation": body["operation"], "http": code, "serverStatus": server_status,
+               "serverTitle": server_title, "requestIdValid": valid_request, "sourceDeviceIdValid": valid_source}
+    if "expectedHash" in body:
+        details["expectedHashPresent"] = diagnostic_flag("DiagnosticHashPresent", body["expectedHash"])
+    report = as_text(dictionary(details))
+    add("is.workflow.actions.showresult", Text=text(report))
+
+
 def request(body):
     encoded = as_text(dictionary(body))
     response = app("GetContentsOfURLExtendedIntent", method="POST", followRedirects=False,
@@ -170,7 +197,7 @@ def request(body):
         end(transient)
     end(lan)
     # Normal return for 401/403/409/422/429 etc. prevents x-error fallback.
-    add("is.workflow.actions.showresult", Text=text(code))
+    failure_report(response, code, body)
     stop()
     end(failure)
     decoded = add("is.workflow.actions.detect.dictionary", WFInput=attach(property_ref(response, "bodyText")))
