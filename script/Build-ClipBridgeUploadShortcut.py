@@ -16,6 +16,17 @@ PAIR = "clipbridge-pairing-v1"
 PENDING = "clipbridge-upload-pending-v1"
 TEAM = "YG56YK5RN5"
 actions = []
+OUTPUT_NAMES = {
+    "is.workflow.actions.getclipboard": "Clipboard",
+    "is.workflow.actions.detect.text": "Text",
+    "is.workflow.actions.gettext": "Text",
+    "is.workflow.actions.detect.dictionary": "Dictionary",
+    "is.workflow.actions.dictionary": "Dictionary",
+    "is.workflow.actions.getvalueforkey": "Dictionary Value",
+    "com.sindresorhus.Actions.KeychainGetIntent": "Keychain Value",
+    "com.sindresorhus.Actions.GenerateUUIDIntent": "UUID",
+    "com.sindresorhus.Actions.GetContentsOfURLExtendedIntent": "HTTP Response",
+}
 
 
 def uid():
@@ -25,7 +36,8 @@ def uid():
 def add(identifier, **parameters):
     parameters.setdefault("UUID", uid())
     actions.append({"WFWorkflowActionIdentifier": identifier, "WFWorkflowActionParameters": parameters})
-    return {"Type": "ActionOutput", "OutputUUID": parameters["UUID"], "OutputName": "Result"}
+    return {"Type": "ActionOutput", "OutputUUID": parameters["UUID"],
+            "OutputName": OUTPUT_NAMES.get(identifier, "Result")}
 
 
 def attach(value):
@@ -89,6 +101,11 @@ def key_set(key, value):
 
 
 def begin(value, condition=4, expected=None, numeric=False):
+    # Dictionary Value is polymorphic. iOS cannot select a text comparison
+    # parameter until its input has an explicit text type, even if the literal
+    # comparison value is present in the plist. Keep equality/inequality intact.
+    if expected is not None and not numeric:
+        value = as_text(value)
     group = uid()
     params = {"GroupingIdentifier": group, "WFControlFlowMode": 0, "WFCondition": condition,
               "WFInput": {"Type": "Variable", "Variable": attach(value)}}
@@ -255,7 +272,7 @@ def build():
 
 
 def validate(workflow):
-    seen, groups = set(), []
+    seen, groups, producers = set(), [], {}
     def references(value):
         if isinstance(value, dict):
             if "OutputUUID" in value and value["OutputUUID"] not in seen:
@@ -271,6 +288,10 @@ def validate(workflow):
         if action["WFWorkflowActionIdentifier"] == "is.workflow.actions.conditional":
             mode, group = params["WFControlFlowMode"], params["GroupingIdentifier"]
             if mode == 0:
+                if "WFConditionalActionString" in params:
+                    source = params["WFInput"]["Variable"]["Value"]
+                    if producers.get(source.get("OutputUUID")) != "is.workflow.actions.detect.text":
+                        raise ValueError("Text comparisons require an explicitly typed text input")
                 groups.append(group)
             elif not groups or groups[-1] != group:
                 raise ValueError("Unbalanced conditional")
@@ -279,6 +300,7 @@ def validate(workflow):
         if params["UUID"] in seen:
             raise ValueError("Duplicate action UUID")
         seen.add(params["UUID"])
+        producers[params["UUID"]] = action["WFWorkflowActionIdentifier"]
     if groups:
         raise ValueError("Unclosed conditional")
 
