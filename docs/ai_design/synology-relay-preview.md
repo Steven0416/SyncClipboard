@@ -43,3 +43,18 @@ dotnet publish src/SyncClipboard.Server -c Release -r linux-x64 -p:PublishProfil
 - 当前物理 Wi-Fi 被 Windows 分类为公共网络。预览配置保持公共网络监听关闭；自动审批拒绝过开启该开关的准备命令，未执行该命令。准备测试方案时不绕过该限制，需用户明确允许仅在该可信网卡上监听后才能进行本机 LAN 真机验收。
 
 镜像归档不包含原版 NAS 数据。尚未导入或运行 NAS 试用容器，尚未启动 Windows 预览客户端；部署需要确认新服务将通过现有 HTTPS 入口可达。
+
+## 授权后的实际部署与运行验证
+
+2026-10-22 用户明确允许独立测试容器，以及仅可信 WLAN 2 的 5034 监听。预览配置已按授权启用所选网卡的公共类别访问，没有改 Windows 网络类别或代操作防火墙提示。
+
+- 已经 DSM UI 导入已校验镜像并创建独立项目/数据目录。Synology 不自动创建缺失的嵌套 bind mount 目录；首次启动因 data 不存在失败，使用 File Station 补建此目录后构建启动成功。
+- 新 HTTPS 入口：未认证 401；独立测试认证 capabilities 200，version=1、textRelay=true、offlineQueue=false。原 5033 服务仍返回预期认证响应，未替换生产容器或挂载目录。
+- WinUI publish 曾遗漏主 SyncClipboard.pri，导致运行时 XamlParseException。发布规则现仅补入主 PRI，SDK 本身已经发布 XBF，不能再次重复收集。修复后预览版实际窗口打开，5034 capabilities 200，配对设备匹配。
+- 真实 NAS 请求经 HTTPS/SignalR 到达 Windows 桥接：200、status=ok、设备匹配。未打印剪贴板正文。
+- 使用本机探针调用生产路由类，实际完成 LAN → NAS（主动选择不可达的 LAN 端点）→ LAN。各路返回的实时剪贴板 hash 一致。此验证不等于真实断开 Wi-Fi 或 iPhone 蜂窝网络验收。
+- 原版真实用户配置哈希仍与启动前一致。Windows 预览版尚未设置登录启动。
+- Windows 系统弹出新程序的防火墙权限提示，尚未代操作，已交给用户决定。监听某网卡与允许防火墙入站是两项不同设置。
+- iPhone 完整上传/下载自动入口尚待配对和实际数据验收；错误回调控制流已实测成功，不能以此宣布整个 0.2 已完成或发布。
+
+新的用户部署步骤必须在启动项目前先创建独立 data 子目录。来源镜像是本项目构建，导入后显示 clipbridge-relay:0.2.0-dev.1，和官方镜像独立保留。

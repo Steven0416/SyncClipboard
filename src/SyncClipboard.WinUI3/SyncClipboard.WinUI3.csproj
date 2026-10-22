@@ -33,6 +33,17 @@
     <Delete Files="$(OutputPath)\appsettings.json" />
   </Target>
 
+  <Target Name="IncludeWinUIResourcesInPublish" AfterTargets="ComputeFilesToPublish">
+    <ItemGroup>
+      <ResolvedFileToPublish Include="$(TargetDir)$(AssemblyName).pri"
+                             Exclude="@(ResolvedFileToPublish)"
+                             Condition="Exists('$(TargetDir)$(AssemblyName).pri')">
+        <RelativePath>$(AssemblyName).pri</RelativePath>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </ResolvedFileToPublish>
+    </ItemGroup>
+  </Target>
+
   <Target Name="DeleteWindowsAppSdkSelfContainedLanguage" AfterTargets="Build">
     <Message Text="Deleting Windows App Sdk self contained language" />
     <RemoveDir Directories="$(OutputPath)\am-ET" />
