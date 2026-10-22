@@ -229,7 +229,7 @@ def request(body):
     stop("Stopped: response contains file data", clear=True)
     end(nontext)
     result_hash = field(profile, "hash")
-    empty_hash = begin(result_hash, 101)
+    empty_hash = begin(character_count(result_hash), 0, "1", numeric=True)
     stop("Stopped: empty profile hash", clear=True)
     end(empty_hash)
     return profile, result_hash
@@ -257,7 +257,7 @@ def build():
     end(active)
     clipboard = add("is.workflow.actions.getclipboard")
     upload = as_text(clipboard)
-    empty_clipboard = begin(upload, 101)
+    empty_clipboard = begin(character_count(upload), 0, "1", numeric=True)
     stop("Clipboard has no text. Copy the test text and run again.")
     end(empty_clipboard)
     write_id = app("GenerateUUIDIntent")
@@ -278,7 +278,7 @@ def build():
     end(state)
     request_id = as_text(field(pending, "requestId"))
     upload_text = as_text(field(pending, "text"))
-    empty_pending = begin(upload_text, 101)
+    empty_pending = begin(character_count(upload_text), 0, "1", numeric=True)
     stop("Saved upload text is empty. Copy the test text and run again.", clear=True)
     end(empty_pending)
     too_large = begin(character_count(upload_text), 2, "262144", numeric=True)
@@ -298,15 +298,24 @@ def build():
     set_variable("Deadline", plain("2"))
     end(nas)
 
-    needs_baseline = begin(expected, 101)
+    # iOS may represent an empty string as a present content item. Existence
+    # tests therefore skip the baseline even though the wire hash is empty.
+    needs_baseline = begin(character_count(expected), 0, "1", numeric=True)
     read_id = app("GenerateUUIDIntent")
     _, baseline_hash = request({"requestId": read_id, "sourceDeviceId": source, "operation": "get"})
-    set_variable("ExpectedHash", baseline_hash)
+    set_variable("ExpectedHash", as_text(baseline_hash))
     updated = dictionary({"version": "1", "state": "active", "requestId": request_id,
                           "text": upload_text, "expectedHash": variable("ExpectedHash")})
     # Persist the baseline before sending any write, so a lost reply cannot acquire a new baseline.
     key_set(PENDING, as_text(updated))
     end(needs_baseline)
+    empty_write_hash = begin(character_count(variable("ExpectedHash")), 0, "1", numeric=True)
+    stop("Stopped: target hash is empty; no write was sent.")
+    end(empty_write_hash)
+    nonblank_hash = add("is.workflow.actions.text.match", WFMatchTextPattern=r"\S", text=text(variable("ExpectedHash")))
+    blank_hash = begin(nonblank_hash, 101)
+    stop("Stopped: target hash is blank; no write was sent.")
+    end(blank_hash)
     result, _ = request({"requestId": request_id, "sourceDeviceId": source, "operation": "set",
                          "text": upload_text, "expectedHash": variable("ExpectedHash")})
     guard(field(result, "text"), upload_text, "Stopped: returned text differs from pending upload")
