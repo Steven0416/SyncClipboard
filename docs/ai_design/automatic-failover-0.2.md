@@ -78,3 +78,5 @@ NAS 反向上传实测：CB-NAS-Upload 同 Wi-Fi 返回 200，电脑独立读取
 快捷指令预览 1 已导入，但用户运行报告多处 If 参数缺失，截图中词典 state 的比较值没有显示。用户修正单个条件后分享的实际源文件显示该条件从 code=4 变成 code=100（有值），原 active 字符串仍保留；不能据此把相等判断全部改成有值。生成器改为在所有文字比较前增加显式 detect.text，将泛型 Dictionary Value 转成 Text 后比较，保留 4/5 的相等/不等语义；魔术变量 OutputName 也与实际动作名称对应。产物现 241 动作，检查器拒绝未明确转文本的文字比较；已重放截图对应旧形态确认拒绝，并验证 active 仍是相等。此结构修正仍待手机导入验收，预览 1 的成功导入不等于成功执行。
 
 用户安装预览 2 后运行显示 HTTP 400，尚不能确定是读取还是写入、协议 invalid-request 还是 JSON 绑定错误。电脑独立正确请求同接口仍 200/ok。为避免继续盲改字段，预览 3 在非成功分支显示安全诊断词典：operation、HTTP、serverStatus、serverTitle、requestIdValid、sourceDeviceIdValid，以及写入时 expectedHashPresent；不显示实际 UUID、认证、文字、目标 hash 或 profile。字段格式标志通过本机 UUID 正则检查产生。此版是定位 400 的诊断版本，尚未修复或验收自动上传。结构校验后产物 294 动作，完整签名文件 42174 字节。
+
+预览 3 用户诊断：operation=set、HTTP400、serverStatus=invalid-request、两个 UUID 格式标志均 yes、expectedHashPresent=yes。依据 LanProtocol.IsValid 仍需区分实际序列化后的 text 缺失/超长、hash 全空白或字段与原变量差异，不能直接宣称已确定根因。预览 4 明确转换待上传文字、来源与请求编号，空/超长 pending 文字在本机停止并清除旧 pending 正文；发送前将实际编码 JSON 回读为词典，用其字段生成诊断，增加 textPresent/textLength/expectedHashLength/expectedHashNonblank。空剪贴板不会在此预览入口发起上传（服务协议本身仍支持空文本）。仅 HTTP400 解析诊断 JSON，其他 HTTP 错误直接显示状态，避免 401 空正文的诊断解析异常误触发 x-error。

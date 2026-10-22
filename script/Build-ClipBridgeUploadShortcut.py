@@ -23,6 +23,7 @@ OUTPUT_NAMES = {
     "is.workflow.actions.detect.dictionary": "Dictionary",
     "is.workflow.actions.dictionary": "Dictionary",
     "is.workflow.actions.getvalueforkey": "Dictionary Value",
+    "is.workflow.actions.count": "Count",
     "com.sindresorhus.Actions.KeychainGetIntent": "Keychain Value",
     "com.sindresorhus.Actions.GenerateUUIDIntent": "UUID",
     "com.sindresorhus.Actions.GetContentsOfURLExtendedIntent": "HTTP Response",
@@ -168,8 +169,14 @@ def diagnostic_flag(name, value, uuid=False):
     return result
 
 
+def character_count(value):
+    value = as_text(value)
+    return add("is.workflow.actions.count", Input=attach(value), WFInput=attach(value), WFCountType="Characters")
+
+
 def failure_report(response, code, body):
     # Report only status and validity flags. Never display request text or headers.
+    bad_request = begin(code, 4, "400", numeric=True)
     error = add("is.workflow.actions.detect.dictionary", WFInput=attach(property_ref(response, "bodyText")))
     server_status = field(error, "status")
     server_title = field(error, "title")
@@ -179,12 +186,23 @@ def failure_report(response, code, body):
                "serverTitle": server_title, "requestIdValid": valid_request, "sourceDeviceIdValid": valid_source}
     if "expectedHash" in body:
         details["expectedHashPresent"] = diagnostic_flag("DiagnosticHashPresent", body["expectedHash"])
+        details["expectedHashLength"] = character_count(body["expectedHash"])
+        nonblank = add("is.workflow.actions.text.match", WFMatchTextPattern=r"\S", text=text(as_text(body["expectedHash"])))
+        details["expectedHashNonblank"] = diagnostic_flag("DiagnosticHashNonblank", nonblank)
+        details["textPresent"] = diagnostic_flag("DiagnosticTextPresent", body["text"])
+        details["textLength"] = character_count(body["text"])
     report = as_text(dictionary(details))
     add("is.workflow.actions.showresult", Text=text(report))
+    otherwise(bad_request)
+    add("is.workflow.actions.showresult", Text=text(code))
+    end(bad_request)
 
 
 def request(body):
     encoded = as_text(dictionary(body))
+    # Diagnose the actual serialized request, rather than the pre-serialization variables.
+    wire_dictionary = add("is.workflow.actions.detect.dictionary", WFInput=attach(encoded))
+    wire_body = {key: field(wire_dictionary, key) for key in body}
     response = app("GetContentsOfURLExtendedIntent", method="POST", followRedirects=False,
                    timeout=attach(variable("Deadline")), headers=attach(variable("Headers")),
                    body=attach(encoded), url=text(variable("Endpoint")), **{"Show-headersList": False})
@@ -197,7 +215,7 @@ def request(body):
         end(transient)
     end(lan)
     # Normal return for 401/403/409/422/429 etc. prevents x-error fallback.
-    failure_report(response, code, body)
+    failure_report(response, code, wire_body)
     stop()
     end(failure)
     decoded = add("is.workflow.actions.detect.dictionary", WFInput=attach(property_ref(response, "bodyText")))
@@ -239,6 +257,9 @@ def build():
     end(active)
     clipboard = add("is.workflow.actions.getclipboard")
     upload = as_text(clipboard)
+    empty_clipboard = begin(upload, 101)
+    stop("Clipboard has no text. Copy the test text and run again.")
+    end(empty_clipboard)
     write_id = app("GenerateUUIDIntent")
     state = dictionary({"version": "1", "state": "active", "requestId": write_id,
                         "text": upload, "expectedHash": ""})
@@ -250,14 +271,20 @@ def build():
     pairing = key_get(PAIR)
     guard(field(pairing, "version"), "1", "Stopped: unsupported pairing version")
     set_variable("DeviceId", field(pairing, "deviceId"))
-    source = field(pairing, "phoneDeviceId")
+    source = as_text(field(pairing, "phoneDeviceId"))
     pending = key_get(PENDING)
     state = begin(field(pending, "state"), 5, "active")
     stop("No active upload. Run the shortcut directly to start one.")
     end(state)
-    request_id = field(pending, "requestId")
-    upload_text = field(pending, "text")
-    expected = set_variable("ExpectedHash", field(pending, "expectedHash"))
+    request_id = as_text(field(pending, "requestId"))
+    upload_text = as_text(field(pending, "text"))
+    empty_pending = begin(upload_text, 101)
+    stop("Saved upload text is empty. Copy the test text and run again.", clear=True)
+    end(empty_pending)
+    too_large = begin(character_count(upload_text), 2, "262144", numeric=True)
+    stop("Saved upload text exceeds the text limit.", clear=True)
+    end(too_large)
+    expected = set_variable("ExpectedHash", as_text(field(pending, "expectedHash")))
 
     nas = begin(variable("Route"), 4, "NAS")
     set_variable("Endpoint", field(pairing, "nasUrl"))
