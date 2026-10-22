@@ -28,7 +28,7 @@ public sealed class LanFirstService(ConfigManager configManager, LanClipboardBri
     private async Task RunAsync(CancellationToken token)
     {
         WebApplication? app = null;
-        var publishers = new List<WindowsMdnsPublisher>();
+        var publishers = new List<BonjourMdnsPublisher>();
         string previous = string.Empty;
         try
         {
@@ -38,7 +38,7 @@ public sealed class LanFirstService(ConfigManager configManager, LanClipboardBri
                 var addresses = config.Enabled ? LanNetworkPolicy.GetAddresses(config.AllowPublicNetworks) : [];
                 var signature = $"{config.Enabled}/{config.Port}/{config.DeviceId}/{config.AllowPublicNetworks}/"
                     + string.Join(',', addresses.Select(item => $"{item.Address}:{item.InterfaceIndex}"));
-                if (signature != previous)
+                if (signature != previous || publishers.Any(publisher => !publisher.IsRunning))
                 {
                     if (app is not null)
                     {
@@ -86,11 +86,12 @@ public sealed class LanFirstService(ConfigManager configManager, LanClipboardBri
                             await app.StartAsync(token);
                             foreach (var address in addresses)
                             {
-                                var publisher = new WindowsMdnsPublisher();
+                                var publisher = new BonjourMdnsPublisher();
                                 publishers.Add(publisher);
-                                await publisher.RegisterAsync(address, config.HostName, config.DeviceId, config.Port);
+                                await publisher.RegisterAsync(address.Address, address.InterfaceIndex,
+                                    config.HostName, config.Port, config.DeviceId, token);
                             }
-                            Status = "LAN listening; mDNS registered (iPhone resolution unverified)";
+                            Status = "LAN listening; Bonjour host and service registered";
                         }
                         catch (Exception ex) when (!token.IsCancellationRequested)
                         {

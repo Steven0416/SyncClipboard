@@ -17,6 +17,7 @@ using SyncClipboard.Core.ViewModels;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using SyncClipboard.Core.RemoteServer;
 
 namespace SyncClipboard.Test;
 
@@ -53,6 +54,48 @@ public sealed class LanFirstTests
         Assert.AreEqual("new local copy", fixture.Text);
         Assert.AreEqual(1, fixture.Writes);
         Assert.AreEqual(1, fixture.PullStoppedMessages);
+    }
+
+    [TestMethod]
+    public async Task LostLanWriteReplyFallsBackWithoutOverwritingNewerLocalCopy()
+    {
+        using var fixture = new Fixture();
+        var current = await fixture.Bridge.ExecuteAsync(Get(), CancellationToken.None);
+        var request = Get() with { Operation = "set", Text = "phone", ExpectedHash = current.Profile!.Hash };
+        var device = fixture.Config.GetConfig<LanFirstConfig>().DeviceId;
+        using var router = new LanFirstRequestRouter(
+            new HttpClient(new RouteHandler(async (message, token) =>
+            {
+                var incoming = await message.Content!.ReadFromJsonAsync<LanRequest>(token);
+                Assert.AreEqual("ok", (await fixture.Bridge.ExecuteAsync(incoming!, token)).Status);
+                fixture.Text = "copied on Windows after the write";
+                throw new HttpRequestException("LAN response lost");
+            })),
+            new HttpClient(new RouteHandler(async (message, token) =>
+            {
+                var incoming = await message.Content!.ReadFromJsonAsync<LanRequest>(token);
+                return new(HttpStatusCode.OK)
+                {
+                    Content = JsonContent.Create(await fixture.Bridge.ExecuteAsync(incoming!, token, "NAS")),
+                };
+            })),
+            new(new Uri("http://paired.local:5034/api/lan-first/v1/clipboard"),
+                new AuthenticationHeaderValue("Bearer", "test"), false),
+            new(new Uri("https://nas.example.test/api/lan-first/v1/devices/" + device + "/clipboard"),
+                new AuthenticationHeaderValue("Basic", "test"), true),
+            device, TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(2));
+        var result = await router.ExecuteAsync(request, TestContext.CancellationTokenSource.Token);
+        Assert.AreEqual(ClipboardTransport.Nas, result.Transport);
+        Assert.IsTrue(result.Response.IsCache);
+        Assert.AreEqual("copied on Windows after the write", fixture.Text);
+        Assert.AreEqual(1, fixture.Writes);
+    }
+
+    private sealed class RouteHandler(Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>> send)
+        : HttpMessageHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken token)
+            => send(request, token);
     }
 
     [TestMethod]
