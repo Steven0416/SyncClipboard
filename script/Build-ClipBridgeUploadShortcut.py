@@ -139,6 +139,16 @@ def guard(value, expected, message):
     end(group)
 
 
+def normalize_uuid(value):
+    return add("is.workflow.actions.text.changecase", WFCaseType="lowercase", text=text(as_text(value)))
+
+
+def guard_uuid(value, expected, message):
+    # JSON serializes System.Guid with lowercase letters; Actions may produce
+    # uppercase UUID text. Compare normalized values without dropping the check.
+    guard(normalize_uuid(value), normalize_uuid(expected), message)
+
+
 def launch(route, fallback=False):
     base = "shortcuts://x-callback-url/run-shortcut?name=" + quote(NAME, safe="")
     url = base + "&input=text&text=" + route
@@ -219,8 +229,8 @@ def request(body):
     stop()
     end(failure)
     decoded = add("is.workflow.actions.detect.dictionary", WFInput=attach(property_ref(response, "bodyText")))
-    guard(field(decoded, "deviceId"), variable("DeviceId"), "Stopped: response device mismatch")
-    guard(field(decoded, "requestId"), body["requestId"], "Stopped: response request mismatch")
+    guard_uuid(field(decoded, "deviceId"), variable("DeviceId"), "Stopped: response device mismatch")
+    guard_uuid(field(decoded, "requestId"), wire_body["requestId"], "Stopped: response request mismatch")
     guard(field(decoded, "status"), "ok", "Stopped: clipboard response was not successful")
     profile = field(decoded, "profile")
     guard(field(profile, "type"), "Text", "Stopped: only text is supported")

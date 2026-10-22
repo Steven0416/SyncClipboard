@@ -82,3 +82,5 @@ NAS 反向上传实测：CB-NAS-Upload 同 Wi-Fi 返回 200，电脑独立读取
 预览 3 用户诊断：operation=set、HTTP400、serverStatus=invalid-request、两个 UUID 格式标志均 yes、expectedHashPresent=yes。依据 LanProtocol.IsValid 仍需区分实际序列化后的 text 缺失/超长、hash 全空白或字段与原变量差异，不能直接宣称已确定根因。预览 4 明确转换待上传文字、来源与请求编号，空/超长 pending 文字在本机停止并清除旧 pending 正文；发送前将实际编码 JSON 回读为词典，用其字段生成诊断，增加 textPresent/textLength/expectedHashLength/expectedHashNonblank。空剪贴板不会在此预览入口发起上传（服务协议本身仍支持空文本）。仅 HTTP400 解析诊断 JSON，其他 HTTP 错误直接显示状态，避免 401 空正文的诊断解析异常误触发 x-error。
 
 预览 4 用户反馈实际写入 JSON：textPresent=yes、textLength=31、expectedHashLength=0、expectedHashNonblank=no，其他 UUID 合法；因此已确认 400 的根因是空目标 hash。iOS 把空字符串视作存在的内容项，原 has-no-value(101) 判断没有进入获取基线分支。预览 5 对基线是否为空、返回 hash 是否为空、发送前 hash 校验及本机文字为空的判断统一使用 Count Characters < 1；Hash 全空白也在写入前停止。非空基线仍复用，不在回退中获取新 hash 覆盖并发本机复制。实际 plist 检查确认读取和写入前的 Count 守卫均在 set 前，产物 374 动作、AEA1 签名 47177 字节。仍待手机执行确认，不能仅凭结构检查宣称上传成功。
+
+预览 5 手机停止于 response request mismatch。电脑使用大写 UUID 发 GET 实际复现：HTTP200，响应 UUID 文本大小写不同，但解析为 Guid 后相等；当前电脑剪贴板不匹配约定自动上传文字，不能认定已写入。预览 6 在请求编号和设备编号比较前对两侧转文本并统一小写；请求编号的期望值使用已序列化请求 JSON 字段，不直接比较 Actions 的 UUID 对象。保留不匹配即停止逻辑。实际产物四处设备/请求比较均检查规范化双方，390 动作，完整 AEA1 48262 字节；尚待手机执行。
