@@ -36,3 +36,31 @@
 管理页面只读检查：用户提供的 HTTP 管理入口自动跳转到已有 HTTPS 管理登录页，说明管理端具备 TLS；这不等于剪贴板服务已经有 HTTPS 反向代理。已打开该页面等待用户登录，尚未读取或更改容器/证书配置。
 
 2026-10-22 后续实测：Actions 的扩展 URL 请求超时报 actions.timeoutError，动作链终止。用户随后按 Apple x-error 方式运行，确认能显示另一个快捷指令中的“回退入口已触发”。因此错误回调控制流已有真机证据，但 NAS 数据传输尚未接入，不能宣称完整自动回退验收通过。
+
+2026-10-22 配对准备：用户确认 Actions 的 Get/Set/Delete 为独立动作，Set 的 key/value 可填，关闭 iCloud 同步后用 clipbridge-test/hello 实测写入并读取成功。新增离线脚本 `script/New-ClipBridgePairingQr.py`，从私有配对文件生成 PNG，包含版本、两端设备标识、两个请求地址及各自认证头。依赖 qrcode 8.2 和 pypng；二维码含凭据，仅保存在忽略目录并在电脑本地打开，不上传聊天或仓库。正在让手机扫描后保存为本机钥匙串 clipbridge-pairing-v1；尚未确认保存完成，也尚未运行手机请求。
+
+随后用户确认扫码流程显示“配对已保存”；该提示是手动填写的完成消息，因此还需从钥匙串重新读取并解析 version=1 来验证内容。离线生成脚本已检查配对结构、拒绝不安全 NAS 地址和 PNG 文件格式；手机请求与自动回退数据通路仍待验收。
+
+用户已从钥匙串重新读取扫码内容、转换为词典并取得 version，实测显示 1，配对读取与 JSON 解析通过。下一项手机测试使用配对的 lanUrl，将末尾 /clipboard 替换成 /capabilities，通过配对的 LAN Authorization 头 GET，仅显示响应 version；此步骤不读取或写入剪贴板。
+
+手机 GET 首次报告超时。电脑排查发现预览版进程已退出，物理 IP 的 5034 主动拒绝连接；Public 防火墙已有对应预览路径的 Allow 规则。最近崩溃堆栈是 H.NotifyIcon 读取 Assets/upload001.ico 时 DirectoryNotFoundException，发布目录缺失整个 Assets 目录。发布目标补入原始 Assets 文件供托盘图标从磁盘读取，保留 PRI 内资源；此缺陷需修复并实际重启验证后再让手机重试，不能直接归因于 mDNS 或要求用户重配凭据。
+
+补充 Assets Content 后发布成功，41 个文件与源码逐一 hash 一致。预览版重启，电脑真实 LAN→NAS→LAN 请求恢复且剪贴板 hash 相同；用户随后用物理 IP GET capabilities 实测显示 1，手机网络和认证通过。
+
+固定名称另有独立缺陷：单独编译实际 BonjourMdnsPublisher，以无凭据诊断名称调用，稳定复现 Bonjour API error -65540（BadParam）。P/Invoke 字符串由 LPWStr 修正为 LPUTF8Str 后，同一诊断完成主机 A 和 DNS-SD 服务注册。Apple DNS-SD 接口使用 UTF-8 char 字符串，不能按 Windows UTF-16 字符串传递。Windows 自身 Dns.GetHostAddressesAsync 的诊断查询仍超时，不能把注册回调成功当成手机解析验收；最终仍需用户用配对名称 GET。
+
+含 UTF-8 修正的 WinUI 独立预览版已重新发布成功并启动。使用选定物理 IPv4 发往 224.0.0.251:5353 的 QU A 查询，实际收到名称与配对 lanUrl 主机完全相同、A 记录为当前物理地址的 mDNS 应答；随后真实 LAN→NAS→LAN 请求通过且实时 hash 一致。首次查询在启动尚未完成时超时，启动完成后通过。正在让用户把 Get Contents of URL 的 URL 恢复为 Replace Text 输出，以验收手机固定名称。
+
+用户恢复 Replaced Text 变量后，手机固定名称 GET capabilities 实测显示 1。至此配对读取、手机入站访问、认证和新固定名称均通过。下一项测试为 POST get 读取电脑文字并显示；电脑已放入明确测试文字，实际 LAN 接口确认内容匹配。该步骤尚不覆盖手机剪贴板，也不代表最终下载入口或自动回退完成。
+
+后续手机实测通过：CB-LAN-Read POST get 显示测试文字，再使用 Copy to Clipboard 后粘贴一致；CB-NAS-Read 使用独立 nasUrl/nasAuthorization，同 Wi-Fi 和关闭 Wi-Fi 的蜂窝网络均读取、粘贴成功；重新连接 Wi-Fi 后 CB-LAN-Read 仍成功。这些是分别运行两条入口，不是自动切换验收。
+
+Actions 扩展请求界面与输出已由用户截图确认：Method、Body、Headers (dictionary/list)、Timeout、Follow Redirects；HTTP Response 可取 Status Code、Body Text 等属性。未认证 GET 实测返回 401 而不中断；正确 Authorization 字典返回 200；Body Text 转词典可取得 version=1。扩展 POST 使用 JSON 字典转文本作为 Body、Authorization 和 Content-Type application/json 标头。首次读取返回 422 unsupported-type，电脑重新放入明确测试文字后接口 200/ok，用户再次运行也确认 status=ok 且 profile.text 匹配。最终入口仍需 HTTP 状态、设备/请求标识、类型校验及错误回调控制，不能以测试中的裸 Copy to Clipboard 作为完成品。
+
+用户随后确认扩展 LAN 入口加 Status Code=200 分支后显示 LAN copied，粘贴测试文字成功。复制为 NAS 扩展入口（NAS URL/认证、15 秒、关闭重定向）时返回 503。电脑仍运行，但日志持续出现 NAS TLS 握手失败。无认证诊断发现 Windows/路由器 UDP DNS 与 Google HTTPS DNS 对 NAS 返回不同 IPv4；默认地址 TLS EOF，另一地址通过 curl --resolve 保留 SNI 与证书校验可访问同一 HTTPS 服务。尚未修改系统 DNS、hosts、生产 NAS 或手机凭据；正在排查缓存/解析路径，不把固定公网 IP 作为正式解决方案。
+
+随后默认 DNS 缓存自然到期，解析更新到可达地址，与两家 HTTPS DNS 一致。未改任何 DNS/hosts/代理设置，预览客户端自动重新连上并注册 NAS；真实 LAN→NAS→LAN 探针全部成功、hash 一致。该事件是动态公网地址变化时旧 DNS 缓存的短暂不可达，不能通过修改手机认证或关闭 TLS 校验解决。手机 NAS 扩展入口重试待确认。
+
+用户重试 NAS 扩展入口成功，显示 NAS copied、粘贴测试文字一致。创建 CB-Auto-Read，用 x-callback-url 先运行 CB-LAN-Read-Extended，x-error 指向 CB-NAS-Read-Extended。用户依次实测：同 Wi-Fi 显示 LAN copied；在 Settings 关闭 Wi-Fi、使用蜂窝网络后显示 NAS copied；重新连接同一 Wi-Fi 后恢复 LAN copied，均粘贴一致。自动读取的断网/恢复主路径已有真机证据。
+
+此入口仍是开发测试组合：当前 LAN 非 200 分支仅显示状态，不会针对 408/502/503/504 转 NAS；x-error 也尚未限定为网络调用错误，因此后续解析异常可能触发回退。手机尚缺设备/请求/类型响应校验；自动上传尚未建立。不能把该组合宣布为全部满足路由规范的 0.2 成品或发布版本。上传必须先保存本机文字，再获取目标 hash，并把同一写入 requestId、expectedHash、text 保存在本机状态中供两通道重试，不能从读取入口复制后把远端文字误当成待上传内容。

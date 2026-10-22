@@ -58,3 +58,5 @@ dotnet publish src/SyncClipboard.Server -c Release -r linux-x64 -p:PublishProfil
 - iPhone 完整上传/下载自动入口尚待配对和实际数据验收；错误回调控制流已实测成功，不能以此宣布整个 0.2 已完成或发布。
 
 新的用户部署步骤必须在启动项目前先创建独立 data 子目录。来源镜像是本项目构建，导入后显示 clipbridge-relay:0.2.0-dev.1，和官方镜像独立保留。
+
+用户随后确认已亲自点击 Windows 防火墙提示的“允许”。此后再次运行真实路由探针，LAN → 不可达 LAN 后经 NAS → LAN 均成功，实时剪贴板 hash 一致。该验证仍是电脑探针，不代表 iPhone 入站访问或蜂窝回退已经验收。用户确认 Actions 的 Keychain: Set 提供 Sync to iCloud 开关；尚待确认键名、值及读取操作的实际界面，再进行本机配对，不在聊天中索取凭据。

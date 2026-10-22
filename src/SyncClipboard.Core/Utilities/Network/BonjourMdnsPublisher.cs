@@ -30,14 +30,14 @@ public sealed class BonjourMdnsPublisher : IAsyncDisposable
     [DllImport("dnssd.dll", CallingConvention = CallingConvention.StdCall)]
     [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     private static extern int DNSServiceRegisterRecord(IntPtr service, out IntPtr record, uint flags,
-        uint interfaceIndex, [MarshalAs(UnmanagedType.LPWStr)] string name, ushort type, ushort recordClass,
+        uint interfaceIndex, [MarshalAs(UnmanagedType.LPUTF8Str)] string name, ushort type, ushort recordClass,
         ushort dataLength, byte[] data, uint ttl, RecordReply callback, IntPtr context);
 
     [DllImport("dnssd.dll", CallingConvention = CallingConvention.StdCall)]
     [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     private static extern int DNSServiceRegister(out IntPtr service, uint flags, uint interfaceIndex,
-        [MarshalAs(UnmanagedType.LPWStr)] string name, [MarshalAs(UnmanagedType.LPWStr)] string type,
-        [MarshalAs(UnmanagedType.LPWStr)] string domain, [MarshalAs(UnmanagedType.LPWStr)] string host,
+        [MarshalAs(UnmanagedType.LPUTF8Str)] string name, [MarshalAs(UnmanagedType.LPUTF8Str)] string type,
+        [MarshalAs(UnmanagedType.LPUTF8Str)] string domain, [MarshalAs(UnmanagedType.LPUTF8Str)] string host,
         ushort networkPort, ushort txtLength, byte[] txt, ServiceReply callback, IntPtr context);
 
     [DllImport("dnssd.dll", CallingConvention = CallingConvention.StdCall)]
