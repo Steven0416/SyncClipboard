@@ -16,12 +16,15 @@ using SyncClipboard.Core.Exceptions;
 using SyncClipboard.Core.Commons;
 using SyncClipboard.Core.Utilities.Updater;
 using System.Security.Cryptography;
+using SyncClipboard.Core.Clipboard;
 
 namespace SyncClipboard.Core.RemoteServer.Adapter.OfficialServer;
 
 public sealed class OfficialAdapter(
     ILogger logger,
-    IAppConfig appConfig)
+    IAppConfig appConfig,
+    LanClipboardBridge? lanClipboard = null,
+    ConfigManager? configManager = null)
     : IServerAdapter<OfficialConfig>, IOfficialServerAdapter, IOfficialSyncServer, IDisposable
 {
     private const int DownloadBufferSize = 102400;
@@ -34,6 +37,24 @@ public sealed class OfficialAdapter(
     private OfficialConfig _officialConfig = new OfficialConfig();
     private HttpClient _httpClient = new HttpClient();
     private IWebProxy _proxy = new WebProxy();
+    public bool OnDemandEnabled => configManager?.GetConfig<LanFirstConfig>().OnDemandNas == true;
+    public string OnDemandStatus { get; private set; } = "Disabled";
+
+    public async Task<bool> SupportsLanFirstAsync(CancellationToken token)
+    {
+        if (!Uri.TryCreate(_officialConfig.RemoteURL, UriKind.Absolute, out var uri) || uri.Scheme != "https")
+        {
+            return false;
+        }
+        using var response = await _httpClient.GetAsync("api/lan-first/v1/capabilities", token);
+        if (!response.IsSuccessStatusCode)
+        {
+            return false;
+        }
+        using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync(token));
+        return document.RootElement.TryGetProperty("version", out var version) && version.GetInt32() == 1
+            && document.RootElement.TryGetProperty("textRelay", out var textRelay) && textRelay.GetBoolean();
+    }
 
     public event Action<ProfileDto>? ProfileDtoChanged;
     public event Action<HistoryRecordDto>? HistoryChanged;
@@ -108,6 +129,25 @@ public sealed class OfficialAdapter(
             HistoryChanged?.Invoke(historyRecord);
         });
 
+        var connection = _hubConnection;
+        connection.On<LanRequest>(LanProtocol.RequestEvent, async request =>
+        {
+            if (!OnDemandEnabled || lanClipboard is null)
+            {
+                return;
+            }
+            try
+            {
+                using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+                var response = await lanClipboard.ExecuteAsync(request, timeout.Token, "NAS");
+                await connection.InvokeAsync("CompleteLanRequestV1", response, timeout.Token);
+            }
+            catch (Exception ex)
+            {
+                _logger.Write("LAN-RELAY", $"Request failed: {ex.GetType().Name}");
+            }
+        });
+
         StartSignalRConnectiron(_hubConnection);
     }
 
@@ -116,8 +156,21 @@ public sealed class OfficialAdapter(
         try
         {
             await hubConnection.StartAsync();
+            if (OnDemandEnabled && configManager is not null)
+            {
+                try
+                {
+                    await hubConnection.InvokeAsync("RegisterLanDeviceV1", configManager.GetConfig<LanFirstConfig>().DeviceId);
+                    OnDemandStatus = "NAS on-demand connected";
+                }
+                catch
+                {
+                    OnDemandStatus = "NAS upgrade required; on-demand unavailable";
+                }
+            }
             hubConnection.Closed += arg =>
             {
+                OnDemandStatus = "NAS disconnected";
                 ServerDisconnected?.Invoke(arg);
                 return Task.CompletedTask;
             };
