@@ -35,8 +35,9 @@ public sealed class LanFirstService(ConfigManager configManager, LanClipboardBri
             while (!token.IsCancellationRequested)
             {
                 var config = configManager.GetConfig<LanFirstConfig>();
-                var addresses = config.Enabled ? LanNetworkPolicy.GetAddresses(config.AllowPublicNetworks) : [];
-                var signature = $"{config.Enabled}/{config.Port}/{config.DeviceId}/{config.AllowPublicNetworks}/"
+                var addresses = config.Enabled
+                    ? LanNetworkPolicy.GetAddresses(config.AllowPublicNetworks, config.InterfaceId) : [];
+                var signature = $"{config.Enabled}/{config.Port}/{config.DeviceId}/{config.AllowPublicNetworks}/{config.InterfaceId}/"
                     + string.Join(',', addresses.Select(item => $"{item.Address}:{item.InterfaceIndex}"));
                 if (signature != previous || publishers.Any(publisher => !publisher.IsRunning))
                 {
@@ -81,8 +82,11 @@ public sealed class LanFirstService(ConfigManager configManager, LanClipboardBri
                             });
                             app = builder.Build();
                             LanApi.Map(app, configManager, clipboard, local =>
-                                LanNetworkPolicy.GetAddresses(configManager.GetConfig<LanFirstConfig>().AllowPublicNetworks)
-                                    .Any(item => item.Address.Equals(local)));
+                            {
+                                var current = configManager.GetConfig<LanFirstConfig>();
+                                return LanNetworkPolicy.GetAddresses(current.AllowPublicNetworks, current.InterfaceId)
+                                    .Any(item => item.Address.Equals(local));
+                            });
                             await app.StartAsync(token);
                             foreach (var address in addresses)
                             {

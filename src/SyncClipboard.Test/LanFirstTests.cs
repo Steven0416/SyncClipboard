@@ -18,6 +18,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using SyncClipboard.Core.RemoteServer;
+using SyncClipboard.Core.Utilities.Network;
 
 namespace SyncClipboard.Test;
 
@@ -25,6 +26,19 @@ namespace SyncClipboard.Test;
 public sealed class LanFirstTests
 {
     private static LanRequest Get() => new(Guid.NewGuid(), Guid.NewGuid().ToString("N"), "get");
+
+    [TestMethod]
+    [TestCategory("PlatformWindows")]
+    [DataRow("invalid-adapter")]
+    [DataRow("00000000-0000-0000-0000-000000000000")]
+    public void MissingSelectedAdapterNeverBindsOtherNetworks(string interfaceId)
+    {
+        if (!OperatingSystem.IsWindows())
+        {
+            Assert.Inconclusive("Requires Windows network categories.");
+        }
+        Assert.IsEmpty(LanNetworkPolicy.GetAddresses(true, interfaceId));
+    }
 
     [TestMethod]
     public async Task GetReadsCurrentClipboardWithoutRemoteStorage()

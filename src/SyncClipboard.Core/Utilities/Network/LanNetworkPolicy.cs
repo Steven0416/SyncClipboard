@@ -23,11 +23,20 @@ public static class LanNetworkPolicy
     }
 
     // Fail closed if Windows cannot determine network categories. No SSID/location permission needed.
-    public static IReadOnlyList<LanAddress> GetAddresses(bool allowPublic)
+    public static IReadOnlyList<LanAddress> GetAddresses(bool allowPublic, string? interfaceId = null)
     {
         if (!OperatingSystem.IsWindows())
         {
             return [];
+        }
+        Guid? selectedAdapter = null;
+        if (!string.IsNullOrWhiteSpace(interfaceId))
+        {
+            if (!Guid.TryParse(interfaceId, out var adapter))
+            {
+                return [];
+            }
+            selectedAdapter = adapter;
         }
         var trusted = new HashSet<Guid>();
         object? manager = null;
@@ -73,7 +82,8 @@ public static class LanNetworkPolicy
         }
         return NetworkInterface.GetAllNetworkInterfaces()
             .Where(item => item.OperationalStatus == OperationalStatus.Up
-                && Guid.TryParse(item.Id, out var id) && trusted.Contains(id))
+                && Guid.TryParse(item.Id, out var id) && trusted.Contains(id)
+                && (selectedAdapter is null || selectedAdapter == id))
             .SelectMany(item => item.GetIPProperties().UnicastAddresses
                 .Where(address => address.Address.AddressFamily == AddressFamily.InterNetwork
                     && !IPAddress.IsLoopback(address.Address) && !address.Address.ToString().StartsWith("169.254."))
