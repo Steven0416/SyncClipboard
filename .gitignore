@@ -471,3 +471,7 @@ build/temp/
 
 # Public, credential-free container build profile.
 !src/SyncClipboard.Server/Properties/PublishProfiles/LanRelayContainer.pubxml
+
+# Local NAS deployment credentials and persistent data; only examples are public.
+/script/deployment/clipbridge/.env
+/script/deployment/clipbridge/data/

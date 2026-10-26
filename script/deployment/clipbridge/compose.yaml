@@ -1,0 +1,11 @@
+services:
+  clipbridge-relay:
+    image: clipbridge-relay:0.2.0-preview.1
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${CLIPBRIDGE_LOCAL_PORT:-8787}:5033"
+    environment:
+      SYNCCLIPBOARD_USERNAME: ${CLIPBRIDGE_USERNAME:?Set CLIPBRIDGE_USERNAME in .env}
+      SYNCCLIPBOARD_PASSWORD: ${CLIPBRIDGE_PASSWORD:?Set CLIPBRIDGE_PASSWORD in .env}
+    volumes:
+      - ./data:/app/data

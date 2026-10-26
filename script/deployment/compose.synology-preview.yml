@@ -1,4 +1,6 @@
 # Independent preview deployment. Never mount the existing production data directory here.
+# Historical development deployment. Fresh installs should use ./clipbridge/compose.yaml
+# and ./clipbridge/README.md (public release image and full setup guide).
 services:
   clipbridge-relay-preview:
     image: clipbridge-relay:0.2.0-dev.1
