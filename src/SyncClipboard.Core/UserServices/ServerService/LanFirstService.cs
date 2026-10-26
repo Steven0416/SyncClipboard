@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
+using System.Net.NetworkInformation;
 using SyncClipboard.Core.Clipboard;
 using SyncClipboard.Core.Commons;
 using SyncClipboard.Core.Interfaces;
@@ -14,6 +15,7 @@ public sealed class LanFirstService(ConfigManager configManager, LanClipboardBri
 {
     private CancellationTokenSource? _lifetime;
     private Task? _worker;
+    private int _republishRequested;
     public string Status { get; private set; } = "Stopped";
     public string Addresses { get; private set; } = string.Empty;
 
@@ -22,48 +24,38 @@ public sealed class LanFirstService(ConfigManager configManager, LanClipboardBri
         // Persist identity once, before any broadcast. Never regenerate on a network change.
         configManager.SetConfig(configManager.GetConfig<LanFirstConfig>());
         _lifetime = new();
-        _worker = RunAsync(_lifetime.Token);
+        NetworkChange.NetworkAddressChanged += OnNetworkChanged;
+        _worker = Task.Run(() => RunAsync(_lifetime.Token));
     }
+
+    private void OnNetworkChanged(object? sender, EventArgs args) => Interlocked.Exchange(ref _republishRequested, 1);
 
     private async Task RunAsync(CancellationToken token)
     {
         WebApplication? app = null;
-        var publishers = new List<BonjourMdnsPublisher>();
+        await using var discovery = new MdnsRegistrationSupervisor(() => new BonjourMdnsPublisher(), TimeProvider.System);
         string previous = string.Empty;
+        string previousStatus = string.Empty;
         try
         {
             while (!token.IsCancellationRequested)
             {
-                var config = configManager.GetConfig<LanFirstConfig>();
-                var addresses = config.Enabled
-                    ? LanNetworkPolicy.GetAddresses(config.AllowPublicNetworks, config.InterfaceId) : [];
-                var signature = $"{config.Enabled}/{config.Port}/{config.DeviceId}/{config.AllowPublicNetworks}/{config.InterfaceId}/"
-                    + string.Join(',', addresses.Select(item => $"{item.Address}:{item.InterfaceIndex}"));
-                if (signature != previous || publishers.Any(publisher => !publisher.IsRunning))
+                try
                 {
-                    if (app is not null)
+                    var config = configManager.GetConfig<LanFirstConfig>();
+                    var addresses = config.Enabled
+                        ? LanNetworkPolicy.GetAddresses(config.AllowPublicNetworks, config.InterfaceId) : [];
+                    var signature = $"{config.Enabled}/{config.Port}/{config.DeviceId}/{config.AllowPublicNetworks}/{config.InterfaceId}/"
+                        + string.Join(',', addresses.Select(item => $"{item.Address}:{item.InterfaceIndex}"));
+                    if (signature != previous || app is null && addresses.Count > 0)
                     {
-                        await app.StopAsync(CancellationToken.None);
-                        await app.DisposeAsync();
-                        app = null;
-                    }
-                    foreach (var publisher in publishers)
-                    {
-                        try
+                        if (app is not null)
                         {
-                            await publisher.DisposeAsync();
+                            await StopListenerAsync(app);
+                            app = null;
                         }
-                        catch (Exception ex)
-                        {
-                            logger.Write("LAN", $"mDNS deregistration failed: {ex.GetType().Name}");
-                        }
-                    }
-                    publishers.Clear();
-                    Addresses = string.Join(", ", addresses.Select(item => item.Address));
-                    Status = config.Enabled ? "No permitted network / Offline" : "Disabled";
-                    if (addresses.Count > 0)
-                    {
-                        try
+                        Addresses = string.Join(", ", addresses.Select(item => item.Address));
+                        if (addresses.Count > 0)
                         {
                             if (config.Port == 0 || !Guid.TryParse(config.DeviceId, out _) || config.Token.Length < 64)
                             {
@@ -88,22 +80,24 @@ public sealed class LanFirstService(ConfigManager configManager, LanClipboardBri
                                     .Any(item => item.Address.Equals(local));
                             });
                             await app.StartAsync(token);
-                            foreach (var address in addresses)
-                            {
-                                var publisher = new BonjourMdnsPublisher();
-                                publishers.Add(publisher);
-                                await publisher.RegisterAsync(address.Address, address.InterfaceIndex,
-                                    config.HostName, config.Port, config.DeviceId, token);
-                            }
-                            Status = "LAN listening; Bonjour host and service registered";
                         }
-                        catch (Exception ex) when (!token.IsCancellationRequested)
-                        {
-                            Status = $"LAN / mDNS error: {ex.GetType().Name}";
-                            logger.Write("LAN", Status);
-                        }
+                        previous = signature;
                     }
-                    previous = Status.StartsWith("LAN / mDNS error:") ? string.Empty : signature;
+                    // Losing Bonjour must not close a healthy HTTP listener. Recovery only replaces DNS-SD handles.
+                    await discovery.EnsureAsync(addresses, config.HostName, config.Port, config.DeviceId,
+                        Interlocked.Exchange(ref _republishRequested, 0) != 0, token);
+                    Status = app is not null ? $"LAN listening; {discovery.Status}"
+                        : config.Enabled ? "No permitted network / Offline" : "Disabled";
+                }
+                catch (Exception ex) when (!token.IsCancellationRequested)
+                {
+                    Status = $"LAN retrying: {ex.GetType().Name}";
+                    previous = string.Empty;
+                }
+                if (Status != previousStatus)
+                {
+                    logger.Write("LAN", Status);
+                    previousStatus = Status;
                 }
                 await Task.Delay(TimeSpan.FromSeconds(5), token);
             }
@@ -115,26 +109,31 @@ public sealed class LanFirstService(ConfigManager configManager, LanClipboardBri
         {
             if (app is not null)
             {
-                await app.StopAsync(CancellationToken.None);
-                await app.DisposeAsync();
-            }
-            foreach (var publisher in publishers)
-            {
-                try
-                {
-                    await publisher.DisposeAsync();
-                }
-                catch (Exception ex)
-                {
-                    logger.Write("LAN", $"mDNS stop failed: {ex.GetType().Name}");
-                }
+                await StopListenerAsync(app);
             }
             Status = "Stopped";
         }
     }
 
+    private static async Task StopListenerAsync(WebApplication app)
+    {
+        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        try
+        {
+            await app.StopAsync(timeout.Token);
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        finally
+        {
+            await app.DisposeAsync();
+        }
+    }
+
     protected override async Task StopSerivceAsync()
     {
+        NetworkChange.NetworkAddressChanged -= OnNetworkChanged;
         _lifetime?.Cancel();
         if (_worker is not null)
         {

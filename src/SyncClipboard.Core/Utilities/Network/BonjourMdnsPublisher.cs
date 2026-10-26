@@ -5,9 +5,27 @@ using System.Text;
 
 namespace SyncClipboard.Core.Utilities.Network;
 
-/// <summary>Publishes an explicit host A record and DNS-SD service using an installed Apple Bonjour daemon.</summary>
-public sealed class BonjourMdnsPublisher : IAsyncDisposable
+public interface IBonjourPublisher : IAsyncDisposable
 {
+    bool IsRunning { get; }
+    Task RegisterAsync(IPAddress address, uint interfaceIndex, string hostName, ushort port,
+        string deviceId, CancellationToken token = default);
+    Task<bool> VerifyAsync(IPAddress address, uint interfaceIndex, string hostName, CancellationToken token);
+}
+
+/// <summary>Publishes an explicit host A record and DNS-SD service using an installed Apple Bonjour daemon.</summary>
+public sealed class BonjourMdnsPublisher : IBonjourPublisher
+{
+    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+    private delegate void QueryReply(IntPtr service, uint flags, uint interfaceIndex, int error, IntPtr name,
+        ushort type, ushort recordClass, ushort length, IntPtr data, uint ttl, IntPtr context);
+
+    [DllImport("dnssd.dll", CallingConvention = CallingConvention.StdCall)]
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+    private static extern int DNSServiceQueryRecord(out IntPtr service, uint flags, uint interfaceIndex,
+        [MarshalAs(UnmanagedType.LPUTF8Str)] string name, ushort type, ushort recordClass,
+        QueryReply callback, IntPtr context);
+
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate void RecordReply(IntPtr service, IntPtr record, uint flags, int error, IntPtr context);
 
@@ -62,7 +80,63 @@ public sealed class BonjourMdnsPublisher : IAsyncDisposable
     private ServiceReply? _serviceCallback;
     private int _registrationCount;
     public string Status { get; private set; } = "Stopped";
-    public bool IsRunning => _worker is { IsCompleted: false } && _ready.Task.IsCompletedSuccessfully;
+    public bool IsRunning => _worker is { IsCompleted: false } && _ready.Task.IsCompletedSuccessfully
+        && !_stop.IsCancellationRequested;
+
+    public Task<bool> VerifyAsync(IPAddress address, uint interfaceIndex, string hostName, CancellationToken token)
+    {
+        return Task.Run(() => QueryAddress(address, interfaceIndex, hostName, token), token);
+    }
+
+    private static bool QueryAddress(IPAddress address, uint interfaceIndex, string hostName, CancellationToken token)
+    {
+        IntPtr query = IntPtr.Zero;
+        bool? found = null;
+        QueryReply callback = (_, flags, index, error, _, type, recordClass, length, data, ttl, _) =>
+        {
+            if (error != 0)
+            {
+                found = false;
+            }
+            else if ((flags & 2) != 0 && index == interfaceIndex && type == 1 && recordClass == 1 && length == 4)
+            {
+                var bytes = new byte[4];
+                Marshal.Copy(data, bytes, 0, bytes.Length);
+                found = ttl > 0 && new IPAddress(bytes).Equals(address);
+            }
+        };
+        try
+        {
+            Check(DNSServiceQueryRecord(out query, 0, interfaceIndex, hostName + ".", 1, 1, callback, IntPtr.Zero));
+            var descriptors = new[] { new PollDescriptor { Socket = DNSServiceRefSockFD(query), Events = 0x0300 } };
+            var deadline = Environment.TickCount64 + 3000;
+            while (found is null && Environment.TickCount64 < deadline)
+            {
+                token.ThrowIfCancellationRequested();
+                if (WSAPoll(descriptors, 1, 250) < 0 || (descriptors[0].ReturnedEvents & 0x0007) != 0)
+                {
+                    return false;
+                }
+                if ((descriptors[0].ReturnedEvents & 0x0300) != 0)
+                {
+                    Check(DNSServiceProcessResult(query));
+                }
+            }
+            return found == true;
+        }
+        catch (Exception) when (!token.IsCancellationRequested)
+        {
+            return false;
+        }
+        finally
+        {
+            if (query != IntPtr.Zero)
+            {
+                DNSServiceRefDeallocate(query);
+            }
+            GC.KeepAlive(callback);
+        }
+    }
 
     public static bool IsValidHostName(string hostName)
     {
