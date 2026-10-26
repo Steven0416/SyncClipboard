@@ -1,4 +1,15 @@
 # SyncClipboard
+
+> **ClipBridge 0.2 下载安装：**[Windows / iPhone / NAS 下载](https://github.com/Steven0416/SyncClipboard/releases/tag/v0.2.0-preview.1) ·
+> [全新 NAS → Windows → iPhone 部署指南](docs/CLIPBRIDGE_DEPLOY_ZH.md) ·
+> [公开 NAS Compose 与环境变量模板](script/deployment/clipbridge)。当前为文字 LAN 优先、HTTPS NAS 回退预览版。
+
+> LAN-first Fork（实验性开发分支）：Fork 自 [Jeric-X/SyncClipboard](https://github.com/Jeric-X/SyncClipboard)，原作者 JericX，保留 MIT 许可证和贡献历史。新增 Windows LAN 文本直连、原生 mDNS 注册与 NAS 按需文本请求。完整目标尚未完成，请保留现有正式环境。
+>
+> [架构与限制](docs/ai_design/lan-first.md) · [编译与配对教程](docs/ai_design/lan-first-setup.md) · [实际测试记录](docs/ai_design/lan-first-validation.md) · [English](docs/ai_design/lan-first.en.md)
+
+> 固定名称 `clipbridge-test.local:5033` 的 Bonjour 主机发布已获 iPhone 实测成功；[后台运行与验证记录](docs/ai_design/bonjour-fixed-hostname.md)。真实 DHCP 换址和完整重启验收仍待完成。
+
 [![build](https://github.com/Jeric-X/SyncClipboard/actions/workflows/build-entry.yml/badge.svg?branch=master)](https://github.com/Jeric-X/SyncClipboard/actions?query=branch%3Amaster)
 
 中文 | [English](docs/README_EN.md)  

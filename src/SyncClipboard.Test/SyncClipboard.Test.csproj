@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ClipBridge.Setup\ClipBridge.Setup.csproj" />
     <ProjectReference Include="..\SyncClipboard.Core\SyncClipboard.Core.csproj" />
     <ProjectReference Include="..\SyncClipboard.Updater.Core\SyncClipboard.Updater.Core.csproj" />
   </ItemGroup>

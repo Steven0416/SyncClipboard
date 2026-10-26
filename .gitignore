@@ -447,6 +447,7 @@ $RECYCLE.BIN/
 
 # End of https://www.gitignore.io/api/csharp,windows,visualstudio
 #tempfiles
+.tools/
 feature.txt
 version.txt
 .vscode/settings.json
@@ -467,3 +468,10 @@ build/linux/pupnet/build_bin/
 TODO.md
 docs/image/todo/FluentAvaloniaContentDialog.png
 build/temp/
+
+# Public, credential-free container build profile.
+!src/SyncClipboard.Server/Properties/PublishProfiles/LanRelayContainer.pubxml
+
+# Local NAS deployment credentials and persistent data; only examples are public.
+/script/deployment/clipbridge/.env
+/script/deployment/clipbridge/data/

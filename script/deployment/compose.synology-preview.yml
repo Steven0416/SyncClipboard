@@ -1,0 +1,15 @@
+# Independent preview deployment. Never mount the existing production data directory here.
+# Historical development deployment. Fresh installs should use ./clipbridge/compose.yaml
+# and ./clipbridge/README.md (public release image and full setup guide).
+services:
+  clipbridge-relay-preview:
+    image: clipbridge-relay:0.2.0-dev.1
+    container_name: clipbridge-relay-preview
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8787:5033"
+    environment:
+      SYNCCLIPBOARD_USERNAME: ${CLIPBRIDGE_USERNAME:?Set a dedicated preview username}
+      SYNCCLIPBOARD_PASSWORD: ${CLIPBRIDGE_PASSWORD:?Set a strong dedicated preview password}
+    volumes:
+      - /volume1/docker/clipbridge-relay-preview/data:/app/data

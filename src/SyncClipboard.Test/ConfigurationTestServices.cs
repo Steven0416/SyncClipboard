@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using SyncClipboard.Core;
+using SyncClipboard.Core.Commons;
 using SyncClipboard.Core.Commons.ConfigMigration;
 
 namespace SyncClipboard.Test;
@@ -16,6 +17,8 @@ public sealed class ConfigurationTestServices : IDisposable
     }
 
     public SyncClipboardConfigUpgrader Upgrader => _provider.GetRequiredService<SyncClipboardConfigUpgrader>();
+
+    public ConfigManager CreateConfigManager(string path) => new(path, Upgrader);
 
     public void Dispose() => _provider.Dispose();
 }
