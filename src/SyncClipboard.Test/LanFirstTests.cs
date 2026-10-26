@@ -28,6 +28,34 @@ public sealed class LanFirstTests
     private static LanRequest Get() => new(Guid.NewGuid(), Guid.NewGuid().ToString("N"), "get");
 
     [TestMethod]
+    public async Task LongTextRemainsInlineForReadAndWrite()
+    {
+        using var fixture = new Fixture();
+        fixture.Text = new string('中', 12000) + "😀\nend";
+        var read = await fixture.Bridge.ExecuteAsync(Get(), CancellationToken.None);
+        Assert.AreEqual(fixture.Text, read.Profile!.Text);
+        Assert.IsFalse(read.Profile.HasData);
+        var incoming = new string('文', 16000) + "\nlast";
+        var request = new LanRequest(Guid.NewGuid(), Guid.NewGuid().ToString("N"), "set", incoming, read.Profile.Hash);
+        var result = await fixture.Bridge.ExecuteAsync(request, CancellationToken.None);
+        Assert.AreEqual("ok", result.Status);
+        Assert.AreEqual(incoming, fixture.Text);
+        Assert.AreEqual(incoming, result.Profile!.Text);
+        Assert.IsFalse(result.Profile.HasData);
+    }
+
+    [TestMethod]
+    public async Task OversizedCurrentTextIsRejectedWithoutWriting()
+    {
+        using var fixture = new Fixture();
+        fixture.Text = new string('x', LanProtocol.MaxTextLength + 1);
+        var result = await fixture.Bridge.ExecuteAsync(Get(), CancellationToken.None);
+        Assert.AreEqual("too-large", result.Status);
+        Assert.IsNull(result.Profile);
+        Assert.AreEqual(0, fixture.Writes);
+    }
+
+    [TestMethod]
     [TestCategory("PlatformWindows")]
     [DataRow("invalid-adapter")]
     [DataRow("00000000-0000-0000-0000-000000000000")]

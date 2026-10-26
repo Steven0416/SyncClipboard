@@ -84,3 +84,9 @@ NAS 反向上传实测：CB-NAS-Upload 同 Wi-Fi 返回 200，电脑独立读取
 预览 4 用户反馈实际写入 JSON：textPresent=yes、textLength=31、expectedHashLength=0、expectedHashNonblank=no，其他 UUID 合法；因此已确认 400 的根因是空目标 hash。iOS 把空字符串视作存在的内容项，原 has-no-value(101) 判断没有进入获取基线分支。预览 5 对基线是否为空、返回 hash 是否为空、发送前 hash 校验及本机文字为空的判断统一使用 Count Characters < 1；Hash 全空白也在写入前停止。非空基线仍复用，不在回退中获取新 hash 覆盖并发本机复制。实际 plist 检查确认读取和写入前的 Count 守卫均在 set 前，产物 374 动作、AEA1 签名 47177 字节。仍待手机执行确认，不能仅凭结构检查宣称上传成功。
 
 预览 5 手机停止于 response request mismatch。电脑使用大写 UUID 发 GET 实际复现：HTTP200，响应 UUID 文本大小写不同，但解析为 Guid 后相等；当前电脑剪贴板不匹配约定自动上传文字，不能认定已写入。预览 6 在请求编号和设备编号比较前对两侧转文本并统一小写；请求编号的期望值使用已序列化请求 JSON 字段，不直接比较 Actions 的 UUID 对象。保留不匹配即停止逻辑。实际产物四处设备/请求比较均检查规范化双方，390 动作，完整 AEA1 48262 字节；尚待手机执行。
+
+2026-10-23 用户因生成版仍失败，明确选择手动指导，不继续生成替换版。最终目标仍是一个可分享的 ClipBridge 菜单入口，而不是保留所有测试快捷指令。当前手工工作于 CB-LAN-Upload-Pending：从本机 pending 取 text/UploadText、requestId/WriteRequestId；先读取电脑 Hash，保存到 ExpextedHash（现有变量拼写，暂不改名），Set Dictionary Value 更新 pending.expectedHash 并写回本机钥匙串，再 operation=set。
+
+手工过程中曾将 requestId 与 text 取值互相覆盖，或遗漏 UploadText 赋值；最新分享的动作证实这些是独立两组都必须保留。用户一度只报告 200，而实际正文是请求 UUID，不能仅以状态验收。后续用户修正两组取值，手机响应 status=ok/profile.text=12345678，电脑 Get-Clipboard 独立精确匹配 12345678=True，正文绑定现已确认。Hash 已实测保存非空。尚待把写入块移到读取成功 If 外，并用 Count Characters <1 决定是否读取基线，之后再实现 NAS 复用同一 pending；此时仍不可把独立两条上传入口直接用 x-error 拼接。
+
+2026-10-26 用户改为要求直接交付完整导入文件。新增单入口生成器与产物级动作解释测试，覆盖发送、获取、配对及内部回调自动选路；实现与验收边界见 [预览 7 记录](clipbridge-shortcut-0.2.7.md)。不再继续要求用户手动组合旧 CB-* 动作。手机尚待导入验收。

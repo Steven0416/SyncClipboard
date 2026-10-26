@@ -46,11 +46,11 @@ public sealed class LanClipboardBridge(IClipboardFactory factory, LocalClipboard
                         return new(request.RequestId, config.DeviceId, "filtered");
                     }
                     var current = await factory.CreateProfileFromMeta(meta, token);
-                    if (current is not TextProfile)
+                    if (current is not TextProfile currentText)
                     {
                         return new(request.RequestId, config.DeviceId, "unsupported-type");
                     }
-                    var dto = await current.ToProfileDto(token);
+                    var dto = await ToInlineText(currentText, token);
                     if (dto.Text.Length > LanProtocol.MaxTextLength)
                     {
                         return new(request.RequestId, config.DeviceId, "too-large");
@@ -76,7 +76,7 @@ public sealed class LanClipboardBridge(IClipboardFactory factory, LocalClipboard
                             {
                                 await setter.Set(incoming, token, false);
                             }
-                            dto = await incoming.ToProfileDto(token);
+                            dto = await ToInlineText(incoming, token);
                             applied = true;
                         }
                         finally
@@ -108,5 +108,18 @@ public sealed class LanClipboardBridge(IClipboardFactory factory, LocalClipboard
         {
             _requests.Release();
         }
+    }
+
+    private static async Task<ProfileDto> ToInlineText(TextProfile profile, CancellationToken token)
+    {
+        // The normal sync DTO moves text over 10 KiB to a separate file. This
+        // text-only protocol carries the complete text in its single response.
+        var local = await profile.Localize(string.Empty, token);
+        return new ProfileDto
+        {
+            Text = local.Text,
+            Hash = await profile.GetHash(token),
+            Size = local.Text.Length
+        };
     }
 }
